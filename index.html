@@ -191,15 +191,21 @@ h1 {
   -webkit-tap-highlight-color: transparent;
 }
 
-.habit:hover {
-  background: var(--accent-soft);
-  padding-left: 12px;
+@media (hover: hover) {
+  .habit:hover {
+    background: var(--accent-soft);
+    padding-left: 12px;
+  }
+  .habit:hover .checkbox {
+    border-color: var(--accent);
+  }
 }
 
 .checkbox {
   width: 18px;
   height: 18px;
   border: 1px solid var(--line-2);
+  border-radius: 50%;
   flex-shrink: 0;
   position: relative;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -207,7 +213,7 @@ h1 {
 }
 
 .habit:hover .checkbox {
-  border-color: var(--accent);
+  /* hover styles now live inside @media (hover: hover) above */
 }
 
 .habit.done .checkbox {
@@ -540,12 +546,15 @@ h1 {
   -webkit-tap-highlight-color: transparent;
   transition: background 0.15s ease;
 }
-.bible-set:hover { background: var(--accent-soft); }
+@media (hover: hover) {
+  .bible-set:hover { background: var(--accent-soft); }
+}
 
 .bible-set .checkbox {
   width: 16px;
   height: 16px;
   border: 1px solid var(--line-2);
+  border-radius: 50%;
   background: var(--bg-2);
   position: relative;
   flex-shrink: 0;
@@ -1673,12 +1682,12 @@ const HABITS = [
   { cat: 'morning', items: [
     { id: 'nophone_am',  text: 'No Phone', modal: 'nophoneAm' },
     { id: 'prayer',      text: 'Prayer', modal: 'prayer' },
-    { id: 'lectio',      text: 'Lectio & Journal', link: 'journal://' },
+    { id: 'lectio',      text: 'Lectio & Journal', link: 'shortcuts://run-shortcut?name=Open%20Journal' },
     { id: 'memorize',    text: 'Memorize Scripture', link: 'https://www.bible.com/bible/1713/ROM.6.1-14.CSB' },
     { id: 'bible',       text: 'Bible Study', modal: 'bible' },
   ]},
   { cat: 'fitness', items: [
-    { id: 'protein',     text: 'Tracked Nutrition', link: 'macrofactor://' },
+    { id: 'protein',     text: 'Tracked Nutrition', link: 'shortcuts://run-shortcut?name=Open%20MacroFactor' },
     { id: 'steps',       text: '10,000 Steps', link: 'x-apple-health://' },
     { id: 'fast',        text: '14 Hour Fast', modal: 'fast' },
     { id: 'gym',         text: 'Gym',  meta: '4× / wk', weekly: true },
@@ -2046,7 +2055,19 @@ function render() {
       const id = el.dataset.id;
       if (state.has(id)) state.delete(id); else state.add(id);
       syncTodayCache();
-      render();
+
+      // In-place DOM update — no full re-render, no animation replay, no flash
+      el.classList.toggle('done', state.has(id));
+
+      // Update this category's counter
+      const section = el.closest('.category');
+      if (section) {
+        const items = section.querySelectorAll('.habit');
+        const doneCount = section.querySelectorAll('.habit.done').length;
+        const counter = section.querySelector('.category-progress');
+        if (counter) counter.textContent = `${doneCount} / ${items.length}`;
+      }
+
       updateProgress();
       renderTodayStats();
       statsViewDirty = true;
