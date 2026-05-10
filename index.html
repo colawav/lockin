@@ -260,6 +260,561 @@ h1 {
   white-space: nowrap;
 }
 
+/* ── LAUNCH ICON ────────────────────────────────── */
+.habit-launch {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px 8px;
+  margin: -8px -2px -8px 6px;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.habit-launch::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text);
+  opacity: 0.55;
+  transition: opacity 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+.habit-launch:hover::before { opacity: 1; background: var(--accent); transform: scale(1.2); }
+.habit-launch:active::before { transform: scale(0.9); }
+
+/* ── MODAL ──────────────────────────────────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(31, 24, 18, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 60px 18px 40px;
+  overflow-y: auto;
+  animation: fadeIn 0.2s ease;
+}
+.modal-backdrop[hidden] { display: none; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal-card {
+  background: var(--bg);
+  max-width: 580px;
+  width: 100%;
+  padding: 36px 32px 44px;
+  position: relative;
+  border: 1px solid var(--line-2);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
+  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 8px 12px;
+  transition: color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.modal-close:hover { color: var(--accent); }
+
+.modal-section { margin-bottom: 36px; }
+.modal-section:last-child { margin-bottom: 0; }
+
+.modal-section-title {
+  font-family: 'Bowlby One', sans-serif;
+  font-weight: 400;
+  font-size: 26px;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.modal-steps {
+  list-style: none;
+  counter-reset: step;
+  padding: 0;
+}
+
+.modal-steps > li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 32px;
+  margin-bottom: 22px;
+}
+.modal-steps > li:last-child { margin-bottom: 0; }
+
+.modal-steps > li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  background: var(--accent-soft);
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.modal-steps h3 {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--text);
+  margin-bottom: 6px;
+  letter-spacing: 0.005em;
+}
+
+.modal-steps p {
+  font-family: 'Nunito', sans-serif;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--text-2);
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+.modal-steps p:last-child { margin-bottom: 0; }
+
+.modal-steps blockquote {
+  font-family: 'Nunito', sans-serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 14.5px;
+  color: var(--text);
+  line-height: 1.55;
+  margin: 8px 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--accent);
+}
+
+/* Modal info blocks (non-numbered content) */
+.modal-intro {
+  font-family: 'Nunito', sans-serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--text-2);
+  line-height: 1.5;
+  margin-top: -10px;
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.modal-block {
+  margin-bottom: 26px;
+}
+.modal-block:last-child { margin-bottom: 0; }
+
+.modal-block h3 {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.modal-block p {
+  font-family: 'Nunito', sans-serif;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--text-2);
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+.modal-block p:last-child { margin-bottom: 0; }
+.modal-block p strong { color: var(--text); font-weight: 800; }
+
+.modal-block ul {
+  list-style: none;
+  padding: 0;
+}
+.modal-block ul li {
+  font-family: 'Nunito', sans-serif;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  padding: 4px 0 4px 18px;
+  position: relative;
+  line-height: 1.5;
+}
+.modal-block ul li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 13px;
+  width: 5px;
+  height: 5px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+.modal-block blockquote {
+  font-family: 'Nunito', sans-serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 14.5px;
+  color: var(--text);
+  line-height: 1.55;
+  margin: 12px 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--accent);
+}
+
+.modal-coda {
+  font-family: 'Nunito', sans-serif;
+  font-style: italic;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.55;
+  text-align: center;
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+/* Bible Study reading set list */
+.bible-progress {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.bible-progress strong {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.bible-sets {
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.bible-set {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 4px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease;
+}
+.bible-set:hover { background: var(--accent-soft); }
+
+.bible-set .checkbox {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--line-2);
+  background: var(--bg-2);
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.18s ease;
+}
+.bible-set.done .checkbox {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.bible-set.done .checkbox::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0;
+  width: 4px;
+  height: 10px;
+  border: solid var(--bg);
+  border-width: 0 1.6px 1.6px 0;
+  transform: rotate(45deg);
+}
+
+.bible-set-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  min-width: 28px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.bible-set-label {
+  font-family: 'Nunito', sans-serif;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  flex: 1;
+}
+
+.bible-set.done .bible-set-label {
+  color: var(--muted);
+}
+
+/* ── BACKUP SECTION ─────────────────────────────── */
+.backup-section {
+  margin-top: 56px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+.backup-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.backup-help {
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  margin-bottom: 18px;
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+}
+
+.backup-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+}
+
+.backup-btn {
+  background: transparent;
+  border: 1px solid var(--line-2);
+  color: var(--text-2);
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 11px 22px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  margin-left: -1px;
+  -webkit-tap-highlight-color: transparent;
+}
+.backup-btn:first-child { margin-left: 0; }
+.backup-btn:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+  z-index: 1;
+  position: relative;
+}
+.backup-btn:active {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.backup-meta {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  margin-top: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── PRIORITIES MODAL ───────────────────────────── */
+.priority {
+  margin-bottom: 38px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line);
+}
+.priority:first-of-type {
+  border-top: none;
+  padding-top: 6px;
+}
+.priority:last-of-type { margin-bottom: 0; }
+
+.priority-title {
+  font-family: 'Bowlby One', sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  color: var(--text);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.priority-num {
+  color: var(--accent);
+}
+
+.priority-label {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-top: 18px;
+  margin-bottom: 10px;
+}
+
+.priority-body {
+  font-family: 'Nunito', sans-serif;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  line-height: 1.55;
+  margin-bottom: 12px;
+}
+.priority-body:last-child { margin-bottom: 0; }
+
+.priority-numbered {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 4px;
+}
+.priority-numbered li {
+  font-family: 'Nunito', sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text);
+  padding: 4px 0 4px 28px;
+  position: relative;
+  line-height: 1.5;
+  counter-increment: pri-num;
+}
+.priority-numbered { counter-reset: pri-num; }
+.priority-numbered li::before {
+  content: counter(pri-num) '.';
+  position: absolute;
+  left: 0;
+  top: 4px;
+  color: var(--accent);
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  width: 22px;
+}
+
+.priority-bullets {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 16px;
+  row-gap: 0;
+  margin-bottom: 12px;
+}
+.priority-bullets.single { grid-template-columns: 1fr; }
+.priority-bullets li {
+  font-family: 'Nunito', sans-serif;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  padding: 4px 0 4px 16px;
+  position: relative;
+  line-height: 1.5;
+}
+.priority-bullets li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 13px;
+  width: 4px;
+  height: 4px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+.priority-trio {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 14px;
+}
+.priority-trio .priority-label { margin-top: 0; }
+.priority-trio ul {
+  list-style: none;
+  padding: 0;
+}
+.priority-trio li {
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-2);
+  padding: 3px 0;
+  line-height: 1.45;
+}
+@media (max-width: 480px) {
+  .priority-trio { grid-template-columns: 1fr; gap: 8px; }
+  .priority-bullets { grid-template-columns: 1fr; }
+}
+
+.priority-coda {
+  font-family: 'Nunito', sans-serif;
+  font-size: 14.5px;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.55;
+  margin-top: 16px;
+  padding: 14px 0 4px;
+  border-top: 1px dashed var(--line-2);
+}
+.priority-coda strong {
+  font-style: normal;
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 6px;
+}
+
 /* ── STATS ──────────────────────────────────────── */
 .stats {
   margin-top: 32px;
@@ -318,10 +873,44 @@ h1 {
 
 .heatmap-grid {
   display: grid;
-  grid-template-columns: repeat(28, 1fr);
+  grid-template-columns: repeat(var(--cols, 28), 1fr);
   gap: 3px;
   max-width: 480px;
   margin: 0 auto;
+}
+
+/* ── WINDOW TOGGLE ──────────────────────────────── */
+.window-toggle {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 28px;
+  gap: 0;
+}
+
+.window-pill {
+  background: transparent;
+  border: 1px solid var(--line-2);
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 8px 13px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  margin-left: -1px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.window-pill:first-child { margin-left: 0; }
+.window-pill:hover { color: var(--text-2); border-color: var(--accent); z-index: 1; position: relative; }
+.window-pill.active {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+  z-index: 2;
+  position: relative;
 }
 
 .heatmap-cell {
@@ -576,44 +1165,535 @@ h1 {
   </div>
 
   <div class="view" id="statsView">
+    <div class="window-toggle" id="windowToggle">
+      <button class="window-pill" data-days="7">7D</button>
+      <button class="window-pill" data-days="14">14D</button>
+      <button class="window-pill active" data-days="28">28D</button>
+      <button class="window-pill" data-days="90">90D</button>
+      <button class="window-pill" data-days="all">All</button>
+    </div>
     <div class="overall-heatmap">
-      <div class="heatmap-title">Overall · Last 28 Days</div>
+      <div class="heatmap-title" id="overallHeatmapTitle">Overall · Last 28 Days</div>
       <div class="heatmap-grid" id="heatmapGrid"></div>
     </div>
     <div id="catStatsContainer"></div>
+    <div class="backup-section">
+      <div class="backup-title">Backup</div>
+      <div class="backup-help">Save a copy of your habit history and Bible reading progress, or restore from a backup file.</div>
+      <div class="backup-buttons">
+        <button class="backup-btn" id="exportBtn">Export</button>
+        <button class="backup-btn" id="importBtn">Import</button>
+      </div>
+      <div class="backup-meta" id="backupMeta"></div>
+    </div>
   </div>
 
-  <div class="epigraph">
-    "Discipline is choosing between what you want now and what you want most."
-    <span class="epigraph-cite">— Abraham Lincoln (attr.)</span>
+  <div class="epigraph" id="epigraph"></div>
+</div>
+
+<div class="modal-backdrop" id="examenModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="examenTitle">
+    <button class="modal-close" data-modal-close aria-label="Close">×</button>
+
+    <div class="modal-section">
+      <h2 class="modal-section-title" id="examenTitle">Examen</h2>
+      <ol class="modal-steps">
+        <li>
+          <h3>Become aware of God's presence</h3>
+          <p>Sit still. Breathe.</p>
+          <blockquote>Lord, you were with me today. Help me see my day through your eyes.</blockquote>
+        </li>
+        <li>
+          <h3>Give thanks</h3>
+          <p>Name specific things. Not general. Specific.</p>
+        </li>
+        <li>
+          <h3>Review the day</h3>
+          <p>Walk through it chronologically.</p>
+          <p>Where did you feel close to God?</p>
+          <p>Where did you feel anxious, prideful, reactive, tempted, discouraged?</p>
+        </li>
+        <li>
+          <h3>Face your shortcomings honestly</h3>
+          <blockquote>Lord, I was impatient there.</blockquote>
+          <blockquote>I gave into distraction.</blockquote>
+          <blockquote>I avoided courage.</blockquote>
+          <p>Receive forgiveness.</p>
+        </li>
+        <li>
+          <h3>Look toward tomorrow</h3>
+          <p>What needs courage?</p>
+          <p>What needs restraint?</p>
+          <p>What needs trust?</p>
+        </li>
+      </ol>
+    </div>
+
+    <div class="modal-section">
+      <h2 class="modal-section-title">Compline</h2>
+      <ol class="modal-steps">
+        <li>
+          <h3>Confession</h3>
+          <blockquote>Lord, I confess my sins of this day, known and unknown.</blockquote>
+        </li>
+        <li>
+          <h3>Scripture</h3>
+          <p>Often Psalm 4, Psalm 91, or Psalm 134 are used. For example, Psalm 4:8 —</p>
+          <blockquote>In peace I will lie down and sleep, for you alone, Lord, make me dwell in safety.</blockquote>
+        </li>
+        <li>
+          <h3>Surrender</h3>
+          <blockquote>Into your hands, O Lord, I commit my spirit.</blockquote>
+        </li>
+        <li>
+          <h3>Closing prayer</h3>
+          <blockquote>Guard me through the night. Protect my mind. Give me rest.</blockquote>
+        </li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- No Phone (morning) -->
+<div class="modal-backdrop" id="nophoneAmModal" hidden>
+  <div class="modal-card">
+    <button class="modal-close" data-modal-close aria-label="Close">×</button>
+    <h2 class="modal-section-title">No Phone</h2>
+    <p class="modal-intro">The first 20 minutes shape the next 20 hours.</p>
+
+    <div class="modal-block">
+      <h3>What the phone does to your morning brain</h3>
+      <p><strong>Cortisol surge.</strong> Notifications and email trigger your stress response before your body has finished waking. You start the day already activated.</p>
+      <p><strong>Dopamine hijack.</strong> Algorithmic feeds flood your brain with synthetic dopamine before its natural waking signals fire — blunting motivation and focus all day.</p>
+      <p><strong>Stolen solitude.</strong> Your mind needs unstructured time to consolidate dreams, plan, and wake into itself. The phone fills that silence with someone else's voice.</p>
+      <p><strong>Cognitive priming.</strong> Whatever loads first becomes the lens for everything after. Algorithms aren't what should shape your day.</p>
+    </div>
+
+    <div class="modal-block">
+      <h3>What to do instead</h3>
+      <ul>
+        <li>Silence</li>
+        <li>Sunlight on your face</li>
+        <li>Prayer before pixels</li>
+        <li>Move your body before you check anything</li>
+      </ul>
+    </div>
+
+    <p class="modal-coda">The man who rules himself in the first hour rules himself the rest of the day.</p>
+  </div>
+</div>
+
+<!-- Prayer -->
+<div class="modal-backdrop" id="prayerModal" hidden>
+  <div class="modal-card">
+    <button class="modal-close" data-modal-close aria-label="Close">×</button>
+    <h2 class="modal-section-title">Prayer</h2>
+    <p class="modal-intro">"Prayer is not the preparation for the work. Prayer is the work." — Oswald Chambers</p>
+
+    <div class="modal-block">
+      <h3>The posture</h3>
+      <p>God is not impressed by performance. Be yourself with Him.</p>
+      <ul>
+        <li>Sit still. Breathe.</li>
+        <li>Don't strain. Don't rush.</li>
+        <li>Listen as much as you speak.</li>
+        <li>Use silence — God speaks in the quiet.</li>
+      </ul>
+    </div>
+
+    <div class="modal-block">
+      <h3>A simple frame · ACTS</h3>
+      <p><strong>Adoration —</strong> who God is.</p>
+      <p><strong>Confession —</strong> where you fell short.</p>
+      <p><strong>Thanksgiving —</strong> what He's given.</p>
+      <p><strong>Supplication —</strong> what you and others need.</p>
+    </div>
+
+    <div class="modal-block">
+      <h3>For my future wife</h3>
+      <blockquote>Father, I lift up the woman I will one day marry. Wherever she is right now, protect her. Strengthen her faith. Heal what needs healing. Surround her with people who point her to You. Teach her to know Your voice. May her heart be undivided, fixed on You. And shape me into the man worthy of her trust — patient, faithful, sober, brave.</blockquote>
+    </div>
+
+    <div class="modal-block">
+      <h3>For the man I'm becoming</h3>
+      <blockquote>Lord, You are forming me into the husband, father, friend, and son You designed me to be. Strip away what is false. Build what is solid. Give me discipline that flows from love, not fear. Let me steward this body, this mind, this name well. The marriage, the family, the life I'm building — all of it is Yours. I want to bring You something honorable when the day comes.</blockquote>
+    </div>
+
+    <p class="modal-coda">"Speak, Lord. Your servant is listening." — 1 Samuel 3:9</p>
+  </div>
+</div>
+
+<!-- Bible Study -->
+<div class="modal-backdrop" id="bibleModal" hidden>
+  <div class="modal-card">
+    <button class="modal-close" data-modal-close aria-label="Close">×</button>
+    <h2 class="modal-section-title">Bible Study</h2>
+    <div class="bible-progress" id="bibleProgressText">— / 102 reading sets complete</div>
+    <ul class="bible-sets" id="bibleSetsList"></ul>
+  </div>
+</div>
+
+<!-- No Corn -->
+<div class="modal-backdrop" id="cornModal" hidden>
+  <div class="modal-card">
+    <button class="modal-close" data-modal-close aria-label="Close">×</button>
+    <h2 class="modal-section-title">No Corn</h2>
+    <p class="modal-intro">"Flee from sexual immorality." — 1 Corinthians 6:18</p>
+
+    <div class="modal-block">
+      <h3>The spiritual cost</h3>
+      <p><strong>It's idolatry.</strong> You're worshipping a counterfeit. The image becomes a god.</p>
+      <p><strong>It severs intimacy.</strong> With God. With the woman in front of you, or coming. With yourself.</p>
+      <p><strong>It teaches you to use, not to love.</strong> To consume, not to commune.</p>
+      <p>It's sin not because God is a killjoy, but because He knows what destroys you. He wants more for you than the lie sells.</p>
+    </div>
+
+    <div class="modal-block">
+      <h3>The neuroscience</h3>
+      <p><strong>Dopamine flood.</strong> Porn delivers more dopamine than nearly any natural stimulus, training your brain to need higher doses for the same hit.</p>
+      <p><strong>Receptor downregulation.</strong> With chronic use, your brain literally shrinks dopamine receptors. You feel less from real life — food, friends, work, sex all dimmer.</p>
+      <p><strong>Prefrontal cortex erosion.</strong> The "no" muscle — impulse control, decision-making — atrophies.</p>
+      <p><strong>Coolidge effect.</strong> Novelty becomes the drug, not the partner. Eventually no real woman can compete with infinite tabs.</p>
+      <p><strong>Recovery is real.</strong> The brain heals. Months of abstinence rebuild reward sensitivity, emotional range, and clarity.</p>
+    </div>
+
+    <div class="modal-block">
+      <h3>What it steals from you</h3>
+      <ul>
+        <li>The husband you want to be</li>
+        <li>The father you want to be</li>
+        <li>Presence, energy, courage, joy</li>
+        <li>Replaces them with: anxiety, shame, hiding, hollowness</li>
+      </ul>
+    </div>
+
+    <div class="modal-block">
+      <h3>If you slip</h3>
+      <p>Get up. Don't spiral. Confess to a brother. Shame is what fuels the cycle. Light is the way out.</p>
+      <blockquote>He who conceals his sins does not prosper, but the one who confesses and renounces them finds mercy. — Proverbs 28:13</blockquote>
+    </div>
+  </div>
+</div>
+
+<!-- No Doomscrolling -->
+<div class="modal-backdrop" id="scrollModal" hidden>
+  <div class="modal-card">
+    <button class="modal-close" data-modal-close aria-label="Close">×</button>
+    <h2 class="modal-section-title">No Doomscrolling</h2>
+    <p class="modal-intro">Your attention is the most valuable thing you own. Stop giving it away for free.</p>
+
+    <div class="modal-block">
+      <h3>What scrolling is actually doing</h3>
+      <p><strong>Variable reward training.</strong> Each refresh is a slot machine pull. Your brain learns: pull, sometimes it pays.</p>
+      <p><strong>Mood degradation.</strong> 2+ hours of social scrolling correlates with higher anxiety, depression, and loneliness — the more you scroll, the worse you feel, but the harder it is to stop.</p>
+      <p><strong>Stolen creativity.</strong> Constant input crowds out the slow, original thoughts that only come in boredom.</p>
+      <p><strong>Cortisol drip.</strong> Outrage and fear posts elevate stress for hours after you put the phone down.</p>
+      <p><strong>Time you can't get back.</strong> The average person scrolls 2.5+ hours/day. That's 38 days a year. A decade is a year of scrolling.</p>
+    </div>
+
+    <div class="modal-block">
+      <h3>Go do something fulfilling</h3>
+      <ul>
+        <li>Go outside. Even 5 minutes. Sun on your face, real space around you.</li>
+        <li>Move. Walk, lift, stretch, breathe.</li>
+        <li>Make something. Write, draw, cook, build, fix.</li>
+        <li>Read something long. A book. A psalm. A real thought.</li>
+        <li>Be with someone. Eye contact. A real conversation.</li>
+        <li>Be still. Boredom is the doorway to depth.</li>
+      </ul>
+    </div>
+
+    <p class="modal-coda">"All of humanity's problems stem from man's inability to sit quietly in a room alone." — Pascal</p>
+  </div>
+</div>
+
+<!-- No Phone Before Bed -->
+<div class="modal-backdrop" id="nophonePmModal" hidden>
+  <div class="modal-card">
+    <button class="modal-close" data-modal-close aria-label="Close">×</button>
+    <h2 class="modal-section-title">No Phone Before Bed</h2>
+    <p class="modal-intro">How you end the day shapes how you start the next one.</p>
+
+    <div class="modal-block">
+      <h3>What screens do at night</h3>
+      <p><strong>Blue light suppresses melatonin.</strong> Your body's "go to sleep" signal gets dimmed for up to 2 hours. You feel tired but can't fall deeply asleep.</p>
+      <p><strong>Cognitive activation.</strong> Whatever you watched, read, or scrolled keeps your brain processing it for hours. Sleep is shallower, dreams more chaotic.</p>
+      <p><strong>Cortisol spike.</strong> Stressful content — news, work email, drama — raises stress hormones at the worst possible time.</p>
+      <p><strong>Sleep debt compounds.</strong> One bad night is recoverable. Chronic phone-in-bed wrecks memory, immunity, weight regulation, and emotional control.</p>
+    </div>
+
+    <div class="modal-block">
+      <h3>What to do instead</h3>
+      <ul>
+        <li>Read a paper book</li>
+        <li>Journal — empty your head onto the page</li>
+        <li>Pray. Compline closes the day in the right hands.</li>
+        <li>Stretch, breathe, get warm</li>
+        <li>Sit in low light with someone you love, or with God</li>
+      </ul>
+    </div>
+
+    <p class="modal-coda">"In peace I will lie down and sleep, for you alone, Lord, make me dwell in safety." — Psalm 4:8</p>
+  </div>
+</div>
+
+<!-- Floss & Brush -->
+<div class="modal-backdrop" id="teethModal" hidden>
+  <div class="modal-card">
+    <button class="modal-close" data-modal-close aria-label="Close">×</button>
+    <h2 class="modal-section-title">Floss & Brush</h2>
+    <p class="modal-intro">Small acts of care, repeated, become a life.</p>
+
+    <div class="modal-block">
+      <h3>Why this matters</h3>
+      <p><strong>Your body is a temple.</strong> Stewarding it well is a form of worship.</p>
+      <p><strong>Hygiene is leadership.</strong> Discipline in small, unseen things builds discipline in the large, seen ones.</p>
+      <p><strong>Attractive isn't accidental.</strong> Clean, healthy, well-tended men get noticed — not because of vanity, but because of the discipline behind it.</p>
+      <p><strong>Long game.</strong> Gum disease is linked to heart disease, cognitive decline, and chronic inflammation. Two minutes a night protects decades.</p>
+    </div>
+
+    <p class="modal-coda">It's two minutes. Don't skip it.</p>
+  </div>
+</div>
+
+<!-- 14 Hour Fast -->
+<div class="modal-backdrop" id="fastModal" hidden>
+  <div class="modal-card">
+    <button class="modal-close" data-modal-close aria-label="Close">×</button>
+    <h2 class="modal-section-title">14 Hour Fast</h2>
+    <p class="modal-intro">A 14–16 hour daily fast is a small reset with outsized returns. The body wasn't built to digest constantly.</p>
+
+    <div class="modal-block">
+      <h3>Metabolic & Hormonal</h3>
+      <p><strong>Insulin reset.</strong> Fasting lowers insulin and improves sensitivity — the foundation of stable energy and healthy body composition.</p>
+      <p><strong>Fat oxidation kicks in.</strong> Around 12 hours, the body shifts from burning glucose to burning stored fat for fuel.</p>
+      <p><strong>Growth hormone rises.</strong> Even moderate fasts spike GH, which preserves muscle and aids recovery.</p>
+      <p><strong>Hunger hormones recalibrate.</strong> Ghrelin and leptin signaling normalizes. You learn what real hunger actually feels like.</p>
+    </div>
+
+    <div class="modal-block">
+      <h3>Cellular Repair</h3>
+      <p><strong>Autophagy.</strong> Cells start cleaning house — recycling damaged proteins and worn-out parts. Your body's self-repair system on.</p>
+      <p><strong>Reduced inflammation.</strong> Fasting suppresses inflammatory markers linked to most chronic disease.</p>
+      <p><strong>Mitochondrial health.</strong> More efficient energy production. New mitochondria get built.</p>
+    </div>
+
+    <div class="modal-block">
+      <h3>Brain & Cognition</h3>
+      <p><strong>BDNF spike.</strong> Brain-derived neurotrophic factor — fertilizer for new neural connections — rises in the fasted state.</p>
+      <p><strong>Mental clarity.</strong> Sharper focus, cleaner thinking. Many people do their best work fasted.</p>
+      <p><strong>Ketone fuel.</strong> Once glycogen depletes, the brain runs on ketones — a cleaner-burning fuel many find more stable than glucose.</p>
+      <p><strong>Neuroprotection.</strong> Lowered long-term risk factors for Alzheimer's and Parkinson's in the research.</p>
+    </div>
+
+    <div class="modal-block">
+      <h3>Longevity</h3>
+      <p><strong>Sirtuin activation.</strong> Genes linked to longevity turn on.</p>
+      <p><strong>Oxidative stress reduction.</strong> Less cellular damage from free radicals.</p>
+      <p><strong>Cardiovascular markers.</strong> Lower LDL, lower triglycerides, lower blood pressure across populations studied.</p>
+    </div>
+
+    <div class="modal-block">
+      <h3>How to do it well</h3>
+      <ul>
+        <li>Close the eating window after dinner. Don't open it before late morning.</li>
+        <li>Water, black coffee, and unsweetened tea are fine — they don't break the fast.</li>
+        <li>Don't break the fast with garbage. Protein and whole foods first.</li>
+        <li>Listen to your body. If you're sick, training intensely, or feeling off, don't force it.</li>
+      </ul>
+    </div>
+
+    <div class="modal-block">
+      <h3>The deeper layer</h3>
+      <p>Fasting has been the practice of saints and disciples for two millennia. It sharpens prayer, disciplines the body, and reminds you what you actually need. The hunger you feel is small and instructive — a flag that you're not, in fact, your appetites.</p>
+    </div>
+
+    <p class="modal-coda">"Man shall not live by bread alone, but by every word that proceeds from the mouth of God." — Matthew 4:4</p>
+  </div>
+</div>
+
+<!-- Priorities -->
+<div class="modal-backdrop" id="prioritiesModal" hidden>
+  <div class="modal-card">
+    <button class="modal-close" data-modal-close aria-label="Close">×</button>
+    <h2 class="modal-section-title">Priorities</h2>
+    <p class="modal-intro">Identity begins at the cross. Review who you are, why, and where you're going.</p>
+
+    <section class="priority">
+      <h3 class="priority-title"><span class="priority-num">1.</span> God</h3>
+      <h4 class="priority-label">Core Values</h4>
+      <ol class="priority-numbered">
+        <li>God's way is better</li>
+        <li>Pray about everything</li>
+        <li>Rejoice in trials and triumphs</li>
+      </ol>
+      <p class="priority-body">My identity begins at the cross. I am chosen and loved by the God of the universe. This is my first priority because all others begin here.</p>
+      <ul class="priority-bullets">
+        <li>Ministry</li>
+        <li>Worship</li>
+        <li>The secret place</li>
+        <li>Prayer rhythm</li>
+        <li>Brotherhood</li>
+        <li>Scripture</li>
+        <li>A pastor</li>
+        <li>Character</li>
+        <li>Home church</li>
+        <li>Generosity</li>
+      </ul>
+      <p class="priority-body">Bear fruit of the Spirit (Galatians 5:22–23).</p>
+      <p class="priority-coda"><strong>This looks like</strong>Seeking His presence — He is the reward. Obedience is greater than sacrifice. Enduring until the end.</p>
+    </section>
+
+    <section class="priority">
+      <h3 class="priority-title"><span class="priority-num">2.</span> Wife</h3>
+      <h4 class="priority-label">Core Values</h4>
+      <ol class="priority-numbered">
+        <li>Love is defined in 1 Corinthians 13:4–7</li>
+        <li>Lay my life down for her</li>
+        <li>Forsake all others</li>
+      </ol>
+      <p class="priority-body">I seek a Spirit-filled marriage with a beautiful woman of God. I will love her like Christ loves the Church. I am becoming the type of man that the woman I want to be with would want to be with.</p>
+      <div class="priority-trio">
+        <div>
+          <h4 class="priority-label">Me</h4>
+          <ul><li>Lead</li><li>Love</li><li>Provide</li><li>Protect</li></ul>
+        </div>
+        <div>
+          <h4 class="priority-label">Us</h4>
+          <ul><li>Listen</li><li>Respect</li><li>Trust</li><li>Sacrifice</li></ul>
+        </div>
+        <div>
+          <h4 class="priority-label">Her</h4>
+          <ul><li>Help</li><li>Love</li><li>Nurture</li><li>Create</li></ul>
+        </div>
+      </div>
+      <p class="priority-coda"><strong>This looks like</strong>Marrying my best friend. Trusting God has the perfect fit for me. Saying yes to each other is saying yes to God. Together, we can build a life and home full of joy, peace, and love.</p>
+    </section>
+
+    <section class="priority">
+      <h3 class="priority-title"><span class="priority-num">3.</span> Kids</h3>
+      <h4 class="priority-label">Core Values</h4>
+      <ol class="priority-numbered">
+        <li>Teach them what I wish I knew</li>
+        <li>Let them be who they are</li>
+        <li>Be present</li>
+      </ol>
+      <p class="priority-body">My prayer is that God will bless me with 2–4 healthy kids. I believe I'm predisposed to be a great father, and it would be one of the greatest honors in my life to be a dad.</p>
+      <ul class="priority-bullets single">
+        <li>Marry a woman fit and willing for this</li>
+        <li>Love each other in front of the kids</li>
+        <li>Surround them with love and community</li>
+        <li>Lead them and befriend them</li>
+      </ul>
+      <p class="priority-coda"><strong>This looks like</strong>Allowing God to be my example of a father. Bringing my kids into a home of joy and laughter. Allowing them to be themselves and raising them to know God.</p>
+    </section>
+
+    <section class="priority">
+      <h3 class="priority-title"><span class="priority-num">4.</span> Vocation</h3>
+      <h4 class="priority-label">Core Values</h4>
+      <ol class="priority-numbered">
+        <li>Use my gifts</li>
+        <li>Dream big and act now</li>
+        <li>Always do the right thing</li>
+      </ol>
+      <p class="priority-body">This is not a job or a career — this is a calling. It may vary by season but there is no retirement. God created me to create.</p>
+      <h4 class="priority-label">My God-given gifts</h4>
+      <ul class="priority-bullets single">
+        <li>Encouragement</li>
+        <li>Wisdom</li>
+        <li>Teaching</li>
+        <li>Creativity</li>
+      </ul>
+      <p class="priority-body">Do not operate outside the will of God.</p>
+      <p class="priority-coda"><strong>This looks like</strong>Building things with integrity. Making a difference and providing value. Committing myself to what I choose to do, with excellence and consistency.</p>
+    </section>
+
+    <section class="priority">
+      <h3 class="priority-title"><span class="priority-num">5.</span> Stewardship</h3>
+      <h4 class="priority-label">Core Values</h4>
+      <ol class="priority-numbered">
+        <li>Be held accountable</li>
+        <li>Do hard things</li>
+        <li>Think long-term</li>
+      </ol>
+      <p class="priority-body">In order to live a full life, I must take care of myself and those I'm responsible for. This means maintaining a degree of health and progress in six key areas: spiritual, mental, emotional, physical, relational, and financial.</p>
+      <ul class="priority-bullets single">
+        <li><strong>Spiritual —</strong> spiritual disciplines and formation</li>
+        <li><strong>Mental —</strong> believe what God says about me</li>
+        <li><strong>Emotional —</strong> availability and accountability</li>
+        <li><strong>Physical —</strong> stay strong and healthy</li>
+        <li><strong>Relational —</strong> good community</li>
+        <li><strong>Financial —</strong> be prosperous and generous</li>
+      </ul>
+      <p class="priority-coda"><strong>This looks like</strong>Maintaining some sort of balance while prioritizing the areas that have the most need. I can only be as good to others as I am to myself.</p>
+    </section>
+
+    <section class="priority">
+      <h3 class="priority-title"><span class="priority-num">6.</span> Impact</h3>
+      <h4 class="priority-label">Core Values</h4>
+      <ol class="priority-numbered">
+        <li>Serve others</li>
+        <li>Always point to Christ</li>
+        <li>Treat everyone well</li>
+      </ol>
+      <p class="priority-body">God made me an encourager for a reason. Whether in a small setting or a large one, I have an opportunity to influence people. This means using my voice, my gifts, and my opportunities wisely.</p>
+      <ul class="priority-bullets">
+        <li>Share the gospel</li>
+        <li>Share ideas</li>
+        <li>Be creative</li>
+        <li>Remain humble</li>
+        <li>Maintain values</li>
+        <li>Be brave</li>
+      </ul>
+      <p class="priority-coda"><strong>This looks like</strong>Building a brand that honors God and serves people. It's not my job to save others, but I can remain a light and a voice of inspiration and encouragement.</p>
+    </section>
+  </div>
+</div>
+
+<!-- Log Habits -->
+<div class="modal-backdrop" id="logModal" hidden>
+  <div class="modal-card">
+    <button class="modal-close" data-modal-close aria-label="Close">×</button>
+    <h2 class="modal-section-title">Log Habits</h2>
+    <p class="modal-intro">Faithfulness in small things.</p>
+
+    <div class="modal-block">
+      <p>Whether the day was 16/16 or 4/16 — you showed up. You closed the loop. That matters more than perfection.</p>
+      <p>The point isn't a clean record. It's awareness. You can't change what you don't measure. You can't grow what you don't see.</p>
+      <p>Some days will be brutal. Log them anyway. The honest 4/16 day is more valuable to your formation than the dishonest 14/16.</p>
+      <p><strong>You're not building streaks. You're building a man.</strong></p>
+    </div>
+
+    <p class="modal-coda">"Whoever can be trusted with very little can also be trusted with much." — Luke 16:10</p>
   </div>
 </div>
 
 <script>
 const HABITS = [
   { cat: 'morning', items: [
-    { id: 'nophone_am',  text: 'No Phone' },
-    { id: 'prayer',      text: 'Prayer' },
-    { id: 'lectio',      text: 'Lectio & Journal' },
-    { id: 'memorize',    text: 'Memorize Scripture' },
-    { id: 'bible',       text: 'Bible Study' },
+    { id: 'nophone_am',  text: 'No Phone', modal: 'nophoneAm' },
+    { id: 'prayer',      text: 'Prayer', modal: 'prayer' },
+    { id: 'lectio',      text: 'Lectio & Journal', link: 'journal://' },
+    { id: 'memorize',    text: 'Memorize Scripture', link: 'https://www.bible.com/bible/1713/ROM.6.1-14.CSB' },
+    { id: 'bible',       text: 'Bible Study', modal: 'bible' },
   ]},
   { cat: 'fitness', items: [
-    { id: 'protein',     text: 'Tracked Nutrition' },
-    { id: 'steps',       text: '10,000 Steps' },
+    { id: 'protein',     text: 'Tracked Nutrition', link: 'macrofactor://' },
+    { id: 'steps',       text: '10,000 Steps', link: 'x-apple-health://' },
+    { id: 'fast',        text: '14 Hour Fast', modal: 'fast' },
     { id: 'gym',         text: 'Gym',  meta: '4× / wk', weekly: true },
     { id: 'hike',        text: 'Hike', meta: '1× / wk', weekly: true },
   ]},
   { cat: 'dopamine', items: [
-    { id: 'noporn',      text: 'No Corn' },
-    { id: 'noscroll',    text: 'No Doomscrolling' },
+    { id: 'noporn',      text: 'No Corn', modal: 'corn' },
+    { id: 'noscroll',    text: 'No Doomscrolling', modal: 'scroll' },
   ]},
   { cat: 'night', items: [
-    { id: 'nophone_pm',  text: 'No Phone Before Bed' },
-    { id: 'teeth',       text: 'Floss & Brush' },
-    { id: 'journal',     text: 'Journal' },
-    { id: 'examen',      text: 'Examen & Compline' },
-    { id: 'log',         text: 'Log Habits' },
+    { id: 'nophone_pm',  text: 'No Phone Before Bed', modal: 'nophonePm' },
+    { id: 'teeth',       text: 'Floss & Brush', modal: 'teeth' },
+    { id: 'examen',      text: 'Examen & Compline', modal: 'examen' },
+    { id: 'priorities',  text: 'Priorities', modal: 'priorities' },
+    { id: 'log',         text: 'Log Habits', modal: 'log' },
   ]},
 ];
 
@@ -638,6 +1718,159 @@ function formatDate(d) {
 
 const ALL_IDS = HABITS.flatMap(c => c.items.map(it => it.id));
 const DAILY_IDS = HABITS.flatMap(c => c.items.filter(it => !it.weekly).map(it => it.id));
+
+const QUOTES = [
+  { text: 'Be still, and know that I am God.', cite: 'Psalm 46:10' },
+  { text: 'Run in such a way as to take the prize.', cite: '1 Corinthians 9:24' },
+  { text: 'I have fought the good fight, I have finished the race, I have kept the faith.', cite: '2 Timothy 4:7' },
+  { text: 'Do not be conformed to this world, but be transformed by the renewal of your mind.', cite: 'Romans 12:2' },
+  { text: 'Be sober-minded; be watchful.', cite: '1 Peter 5:8' },
+  { text: 'He must increase, but I must decrease.', cite: 'John 3:30' },
+  { text: 'The kingdom of heaven suffers violence, and the violent take it by force.', cite: 'Matthew 11:12' },
+  { text: 'Late have I loved you, beauty so old and so new.', cite: 'St. Augustine' },
+  { text: 'Pray as if everything depended on God; work as if everything depended on you.', cite: 'St. Ignatius of Loyola' },
+  { text: 'We can do no great things, only small things with great love.', cite: 'Mother Teresa' },
+  { text: 'All shall be well, and all manner of things shall be well.', cite: 'Julian of Norwich' },
+  { text: 'The glory of God is man fully alive.', cite: 'St. Irenaeus' },
+  { text: 'Waste no more time arguing what a good man should be. Be one.', cite: 'Marcus Aurelius' },
+  { text: 'First say to yourself what you would be; and then do what you have to do.', cite: 'Epictetus' },
+  { text: 'We suffer more often in imagination than in reality.', cite: 'Seneca' },
+];
+
+function renderQuote() {
+  const days = Math.floor(Date.now() / 86400000);
+  const q = QUOTES[days % QUOTES.length];
+  const el = document.getElementById('epigraph');
+  if (el) {
+    el.innerHTML = `"${q.text}"<span class="epigraph-cite">— ${q.cite}</span>`;
+  }
+}
+
+// ── BIBLE STUDY ─────────────────────────────────────
+// Reading plan: OT from 2 Kings forward, skipping Psalms, Proverbs,
+// Ecclesiastes, Song of Songs, and Lamentations (read separately).
+const BIBLE_PLAN = [
+  ['2 Kings', 25],
+  ['1 Chronicles', 29],
+  ['2 Chronicles', 36],
+  ['Ezra', 10],
+  ['Nehemiah', 13],
+  ['Esther', 10],
+  ['Job', 42],
+  ['Isaiah', 66],
+  ['Jeremiah', 52],
+  ['Ezekiel', 48],
+  ['Daniel', 12],
+  ['Hosea', 14],
+  ['Joel', 3],
+  ['Amos', 9],
+  ['Obadiah', 1],
+  ['Jonah', 4],
+  ['Micah', 7],
+  ['Nahum', 3],
+  ['Habakkuk', 3],
+  ['Zephaniah', 3],
+  ['Haggai', 2],
+  ['Zechariah', 14],
+  ['Malachi', 4],
+];
+
+const READING_SETS = (() => {
+  const flat = [];
+  BIBLE_PLAN.forEach(([book, chapters]) => {
+    for (let i = 1; i <= chapters; i++) flat.push({ book, chapter: i });
+  });
+  // Psalm/Proverb cycle: 150 Psalms + 31 Proverbs = 181 positions
+  // Starting at Psalm 81 → zero-indexed position 80
+  const PP_CYCLE = 181;
+  const PP_START = 80;
+
+  // Chunk into groups of 4 chapters
+  const chunks = [];
+  for (let i = 0; i < flat.length; i += 4) chunks.push(flat.slice(i, i + 4));
+
+  // If the final chunk is short, merge it into the previous set so the OT closes
+  // cleanly. The merged final set drops its psalm/proverb.
+  let mergedFinal = false;
+  if (chunks.length > 1 && chunks[chunks.length - 1].length < 4) {
+    const tail = chunks.pop();
+    chunks[chunks.length - 1] = chunks[chunks.length - 1].concat(tail);
+    mergedFinal = true;
+  }
+
+  return chunks.map((chunk, setIdx) => {
+    // Build OT label, grouping by book in case the chunk spans book boundaries
+    const groups = [];
+    let curBook = chunk[0].book;
+    let curStart = chunk[0].chapter;
+    let curEnd = chunk[0].chapter;
+    for (let j = 1; j < chunk.length; j++) {
+      if (chunk[j].book === curBook) {
+        curEnd = chunk[j].chapter;
+      } else {
+        groups.push({ book: curBook, start: curStart, end: curEnd });
+        curBook = chunk[j].book;
+        curStart = curEnd = chunk[j].chapter;
+      }
+    }
+    groups.push({ book: curBook, start: curStart, end: curEnd });
+    const otLabel = groups.map(g =>
+      g.start === g.end ? `${g.book} ${g.start}` : `${g.book} ${g.start}–${g.end}`
+    ).join(' · ');
+
+    // The merged final set has no psalm/proverb
+    const isFinalMerged = mergedFinal && setIdx === chunks.length - 1;
+    if (isFinalMerged) {
+      return { id: setIdx + 1, label: otLabel };
+    }
+
+    const pos = (PP_START + setIdx) % PP_CYCLE;
+    const ppLabel = pos < 150 ? `Psalm ${pos + 1}` : `Proverbs ${pos - 150 + 1}`;
+    return { id: setIdx + 1, label: `${otLabel} + ${ppLabel}` };
+  });
+})();
+
+let bibleProgress = new Set();
+
+async function loadBibleProgress() {
+  try {
+    const r = await storage.get('bible-progress');
+    if (r && r.value) bibleProgress = new Set(JSON.parse(r.value));
+  } catch (e) {}
+}
+
+async function saveBibleProgress() {
+  try {
+    await storage.set('bible-progress', JSON.stringify([...bibleProgress]));
+  } catch (e) {}
+}
+
+function renderBibleSets() {
+  const list = document.getElementById('bibleSetsList');
+  if (!list) return;
+  const total = READING_SETS.length;
+  const done = READING_SETS.filter(s => bibleProgress.has(s.id)).length;
+  document.getElementById('bibleProgressText').innerHTML =
+    `<strong>${done}</strong> / ${total} reading sets complete`;
+
+  list.innerHTML = READING_SETS.map(s => `
+    <li class="bible-set ${bibleProgress.has(s.id) ? 'done' : ''}" data-set-id="${s.id}">
+      <div class="checkbox"></div>
+      <span class="bible-set-num">${s.id}.</span>
+      <span class="bible-set-label">${s.label}</span>
+    </li>
+  `).join('');
+
+  list.querySelectorAll('.bible-set').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = parseInt(el.dataset.setId, 10);
+      if (bibleProgress.has(id)) bibleProgress.delete(id);
+      else bibleProgress.add(id);
+      renderBibleSets();
+      saveBibleProgress();
+    });
+  });
+}
 
 // Storage adapter: Claude artifacts use storage, deployed site uses localStorage.
 const storage = (typeof window !== 'undefined' && window.storage) ? window.storage : {
@@ -666,6 +1899,26 @@ const storage = (typeof window !== 'undefined' && window.storage) ? window.stora
 let state = new Set();
 let allDays = {};         // dKey -> Set<habitId>
 let statsViewDirty = true;
+let statsWindow = 28;     // 7, 28, 90, or 'all'
+
+function getEffectiveWindow() {
+  if (statsWindow !== 'all') return statsWindow;
+  // Find the earliest day with data; fall back to 28 if no history
+  const keys = Object.keys(allDays).sort();
+  if (keys.length === 0) return 28;
+  const oldest = new Date(keys[0]);
+  const today = new Date();
+  const days = Math.ceil((today - oldest) / 86400000) + 1;
+  return Math.max(1, Math.min(days, 365));
+}
+
+function getWindowLabel() {
+  if (statsWindow === 'all') {
+    const eff = getEffectiveWindow();
+    return `All Time · ${eff}d`;
+  }
+  return `Last ${statsWindow} Days`;
+}
 
 function setupTabs() {
   document.querySelectorAll('.tab').forEach(tab => {
@@ -679,6 +1932,16 @@ function setupTabs() {
         renderStatsView();
         statsViewDirty = false;
       }
+    });
+  });
+
+  document.querySelectorAll('.window-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      const days = pill.dataset.days;
+      statsWindow = days === 'all' ? 'all' : parseInt(days, 10);
+      document.querySelectorAll('.window-pill').forEach(p =>
+        p.classList.toggle('active', p === pill));
+      renderStatsView();
     });
   });
 }
@@ -755,13 +2018,24 @@ function render() {
         <span class="category-progress">${done} / ${items.length}</span>
       </div>
       <ul class="habits-list">
-        ${items.map(it => `
-          <li class="habit ${state.has(it.id) ? 'done' : ''}" data-id="${it.id}">
-            <div class="checkbox"></div>
-            <span class="habit-text">${it.text}</span>
-            ${it.meta ? `<span class="habit-meta">${it.meta}</span>` : ''}
-          </li>
-        `).join('')}
+        ${items.map(it => {
+          const launchAttrs = it.link
+            ? `data-launch="link" data-target="${it.link.replace(/"/g, '&quot;')}"`
+            : it.modal
+              ? `data-launch="modal" data-target="${it.modal}"`
+              : '';
+          const launchBtn = (it.link || it.modal)
+            ? `<button class="habit-launch" ${launchAttrs} aria-label="Open"></button>`
+            : '';
+          return `
+            <li class="habit ${state.has(it.id) ? 'done' : ''}" data-id="${it.id}">
+              <div class="checkbox"></div>
+              <span class="habit-text">${it.text}</span>
+              ${it.meta ? `<span class="habit-meta">${it.meta}</span>` : ''}
+              ${launchBtn}
+            </li>
+          `;
+        }).join('')}
       </ul>
     `;
     main.appendChild(section);
@@ -780,7 +2054,34 @@ function render() {
     });
   });
 
+  main.querySelectorAll('.habit-launch').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const kind = btn.dataset.launch;
+      const target = btn.dataset.target;
+      if (kind === 'link') {
+        window.location.href = target;
+      } else if (kind === 'modal') {
+        openModal(target);
+      }
+    });
+  });
+
   updateProgress();
+}
+
+function openModal(id) {
+  const modal = document.getElementById(id + 'Modal');
+  if (!modal) return;
+  modal.hidden = false;
+  document.body.style.overflow = 'hidden';
+  modal.scrollTop = 0;
+  if (id === 'bible') renderBibleSets();
+}
+
+function closeAllModals() {
+  document.querySelectorAll('.modal-backdrop').forEach(m => m.hidden = true);
+  document.body.style.overflow = '';
 }
 
 function updateProgress() {
@@ -818,10 +2119,10 @@ function renderTodayStats() {
   document.getElementById('stats').style.display = 'grid';
 }
 
-function buildHeatmap(habitIds) {
+function buildHeatmap(habitIds, days) {
   const todayStr = dKey(new Date());
   let html = '';
-  for (let i = 27; i >= 0; i--) {
+  for (let i = days - 1; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate() - i);
     const k = dKey(d);
     const pct = pctForDay(k, habitIds);
@@ -831,9 +2132,22 @@ function buildHeatmap(habitIds) {
   return html;
 }
 
+function setHeatmapColumns(grid, days) {
+  // Cap at 30 columns; longer ranges wrap to multiple rows (each row ~ a month)
+  const cols = days <= 30 ? days : 30;
+  grid.style.setProperty('--cols', cols);
+}
+
 function renderStatsView() {
+  const win = getEffectiveWindow();
+
+  // Update the overall heatmap title with current window label
+  document.getElementById('overallHeatmapTitle').textContent = `Overall · ${getWindowLabel()}`;
+
   // Overall heatmap (daily habits — bright = daily lock-in)
-  document.getElementById('heatmapGrid').innerHTML = buildHeatmap(DAILY_IDS);
+  const overallGrid = document.getElementById('heatmapGrid');
+  setHeatmapColumns(overallGrid, win);
+  overallGrid.innerHTML = buildHeatmap(DAILY_IDS, win);
 
   const container = document.getElementById('catStatsContainer');
   container.innerHTML = '';
@@ -842,23 +2156,23 @@ function renderStatsView() {
     const meta = CAT_META[cat];
     const ids = items.map(it => it.id);
 
-    // 28-day average for category
+    // Window-day average for category
     let sum = 0;
-    for (let i = 0; i < 28; i++) {
+    for (let i = 0; i < win; i++) {
       const d = new Date(); d.setDate(d.getDate() - i);
       sum += pctForDay(dKey(d), ids);
     }
-    const avg = Math.round((sum / 28) * 100);
+    const avg = Math.round((sum / win) * 100);
 
-    // Per-habit completion rates over 28 days
+    // Per-habit completion rates over window
     const habitRates = items.map(it => {
       let count = 0;
-      for (let i = 0; i < 28; i++) {
+      for (let i = 0; i < win; i++) {
         const d = new Date(); d.setDate(d.getDate() - i);
         const set = allDays[dKey(d)];
         if (set && set.has(it.id)) count++;
       }
-      return { ...it, rate: count / 28 };
+      return { ...it, rate: count / win };
     });
 
     const section = document.createElement('section');
@@ -869,7 +2183,7 @@ function renderStatsView() {
         <span class="category-title">${meta.title}</span>
         <span class="cat-stats-avg">${avg}<span class="cat-stats-avg-unit">%</span></span>
       </div>
-      <div class="cat-heatmap">${buildHeatmap(ids)}</div>
+      <div class="cat-heatmap"></div>
       <ul class="habit-rates">
         ${habitRates.map(h => {
           const pct = Math.round(h.rate * 100);
@@ -884,7 +2198,97 @@ function renderStatsView() {
       </ul>
     `;
     container.appendChild(section);
+
+    const catGrid = section.querySelector('.cat-heatmap');
+    setHeatmapColumns(catGrid, win);
+    catGrid.innerHTML = buildHeatmap(ids, win);
   });
+}
+
+// ── BACKUP / RESTORE ────────────────────────────────
+function exportData() {
+  const days = {};
+  for (const [k, v] of Object.entries(allDays)) {
+    days[k] = [...v];
+  }
+  const payload = {
+    version: 1,
+    app: 'lockin',
+    exportedAt: new Date().toISOString(),
+    days,
+    bibleProgress: [...bibleProgress],
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `lockin-backup-${dKey(new Date())}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  flashBackupMeta(`Exported · ${Object.keys(days).length} days · ${payload.bibleProgress.length} bible sets`);
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.style.display = 'none';
+  input.addEventListener('change', async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (!data || data.app !== 'lockin' || !data.days) {
+        alert('That file does not look like a Lock In backup.');
+        return;
+      }
+      const dayCount = Object.keys(data.days).length;
+      const bibleCount = (data.bibleProgress || []).length;
+      const ok = confirm(
+        `Restore ${dayCount} day${dayCount === 1 ? '' : 's'} of habits and ${bibleCount} bible reading set${bibleCount === 1 ? '' : 's'}?\n\nThis will REPLACE your current data on this device.`
+      );
+      if (!ok) return;
+
+      // Wipe existing day: keys and bible-progress
+      try {
+        const existing = await storage.list('day:');
+        if (existing && existing.keys) {
+          for (const key of existing.keys) await storage.delete(key);
+        }
+        await storage.delete('bible-progress');
+      } catch (_) { /* keep going even if cleanup fails */ }
+
+      // Write imported data
+      for (const [date, ids] of Object.entries(data.days)) {
+        if (Array.isArray(ids)) {
+          await storage.set(`day:${date}`, JSON.stringify(ids));
+        }
+      }
+      if (Array.isArray(data.bibleProgress)) {
+        await storage.set('bible-progress', JSON.stringify(data.bibleProgress));
+      }
+
+      // Reload to refresh all state cleanly
+      location.reload();
+    } catch (err) {
+      alert('Could not import that file: ' + err.message);
+    }
+  });
+  document.body.appendChild(input);
+  input.click();
+  setTimeout(() => input.remove(), 0);
+}
+
+let backupMetaTimer = null;
+function flashBackupMeta(msg) {
+  const el = document.getElementById('backupMeta');
+  if (!el) return;
+  el.textContent = msg;
+  if (backupMetaTimer) clearTimeout(backupMetaTimer);
+  backupMetaTimer = setTimeout(() => { el.textContent = ''; }, 4000);
 }
 
 async function init() {
@@ -895,7 +2299,27 @@ async function init() {
   render();
   renderTodayStats();
   renderStatsView();
+  renderQuote();
   statsViewDirty = false;
+
+  // Modal close handlers — generic for all modals
+  document.querySelectorAll('[data-modal-close]').forEach(btn => {
+    btn.addEventListener('click', closeAllModals);
+  });
+  document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+    backdrop.addEventListener('click', (e) => {
+      if (e.target === backdrop) closeAllModals();
+    });
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeAllModals();
+  });
+
+  await loadBibleProgress();
+
+  // Backup buttons
+  document.getElementById('exportBtn').addEventListener('click', exportData);
+  document.getElementById('importBtn').addEventListener('click', importData);
 }
 
 init();
