@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#f4ebd8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Lock In">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icon.png">
+<title>LOCK IN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4ebd8;
+  --bg-2: #efe3cb;
+  --surface: #fbf5e8;
+  --text: #1f1812;
+  --text-2: #4a3a26;
+  --muted: #8a7560;
+  --line: #e0d2bc;
+  --line-2: #c8b89e;
+  --accent: #ff964f;
+  --accent-soft: rgba(255, 150, 79, 0.12);
+  --accent-glow: rgba(255, 150, 79, 0.32);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { background: var(--bg); color: var(--text); }
+
+body {
+  color: var(--text);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  min-height: 100vh;
+  padding: 36px 24px 80px;
+  background-image:
+    radial-gradient(ellipse 90% 55% at 50% 0%, rgba(255, 150, 79, 0.07), transparent 70%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ── HEADER ─────────────────────────────────────── */
+header {
+  text-align: center;
+  margin-bottom: 56px;
+  padding-bottom: 36px;
+  position: relative;
+}
+
+header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
+.date {
+  font-family: 'Space Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.28em;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+
+h1 {
+  font-family: 'Bowlby One', sans-serif;
+  font-weight: 400;
+  font-size: clamp(60px, 14vw, 96px);
+  letter-spacing: 0.015em;
+  line-height: 0.95;
+  margin-bottom: 28px;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.progress-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.progress-track {
+  width: 180px;
+  height: 1px;
+  background: var(--line);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  width: 0%;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.progress-count {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-2);
+  letter-spacing: 0.05em;
+}
+
+/* ── CATEGORIES ─────────────────────────────────── */
+.category {
+  margin-bottom: 40px;
+  opacity: 0;
+  animation: fadeUp 0.5s ease forwards;
+}
+
+.category:last-child { margin-bottom: 0; }
+
+.category:nth-child(1) { animation-delay: 0.05s; }
+.category:nth-child(2) { animation-delay: 0.12s; }
+.category:nth-child(3) { animation-delay: 0.19s; }
+.category:nth-child(4) { animation-delay: 0.26s; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.category-header {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 14px;
+  padding: 0 4px;
+}
+
+.category-numeral {
+  font-family: 'Bowlby One', sans-serif;
+  font-weight: 400;
+  font-size: 17px;
+  color: var(--accent);
+  min-width: 28px;
+  letter-spacing: 0.02em;
+}
+
+.category-title {
+  font-family: 'Space Mono', monospace;
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+.category-progress {
+  margin-left: auto;
+  font-family: 'Space Mono', monospace;
+  font-size: 10.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+
+.habits-list {
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.habit {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 6px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  transition: background 0.18s ease, padding 0.18s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.habit:hover {
+  background: var(--accent-soft);
+  padding-left: 12px;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--line-2);
+  flex-shrink: 0;
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--bg-2);
+}
+
+.habit:hover .checkbox {
+  border-color: var(--accent);
+}
+
+.habit.done .checkbox {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.habit.done .checkbox::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 5px;
+  height: 11px;
+  border: solid var(--bg);
+  border-width: 0 1.8px 1.8px 0;
+  transform: rotate(45deg);
+  animation: checkIn 0.25s ease;
+}
+
+@keyframes checkIn {
+  from { opacity: 0; transform: rotate(45deg) scale(0.5); }
+  to { opacity: 1; transform: rotate(45deg) scale(1); }
+}
+
+.habit-text {
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  flex: 1;
+  letter-spacing: 0.005em;
+  transition: color 0.25s ease;
+}
+
+.habit.done .habit-text {
+  color: var(--muted);
+}
+
+.habit.done .habit-text::after {
+  content: '';
+  position: absolute;
+}
+
+.habit-meta {
+  font-family: 'Space Mono', monospace;
+  font-size: 9.5px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+/* ── STATS ──────────────────────────────────────── */
+.stats {
+  margin-top: 32px;
+  padding-top: 0;
+  border-top: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  text-align: center;
+}
+
+.stat-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.stat-value {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 800;
+  font-size: 38px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.stat-unit {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  margin-left: 3px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+/* ── HEATMAP ────────────────────────────────────── */
+.heatmap {
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.heatmap-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(28, 1fr);
+  gap: 3px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.heatmap-cell {
+  aspect-ratio: 1;
+  background: var(--line);
+  transition: transform 0.15s ease;
+}
+
+.heatmap-cell[data-level="1"] { background: rgba(255, 150, 79, 0.22); }
+.heatmap-cell[data-level="2"] { background: rgba(255, 150, 79, 0.5); }
+.heatmap-cell[data-level="3"] { background: rgba(255, 150, 79, 0.78); }
+.heatmap-cell[data-level="4"] { background: var(--accent); box-shadow: 0 0 6px var(--accent-glow); }
+
+.heatmap-cell.today {
+  outline: 1px solid var(--text-2);
+  outline-offset: 1px;
+}
+
+.heatmap-cell:hover {
+  transform: scale(1.4);
+  z-index: 2;
+  position: relative;
+}
+
+/* ── EPIGRAPH ───────────────────────────────────── */
+.epigraph {
+  margin-top: 48px;
+  text-align: center;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+}
+
+.epigraph-cite {
+  display: block;
+  font-style: normal;
+  font-family: 'Space Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.25em;
+  margin-top: 8px;
+  color: var(--line-2);
+}
+
+/* ── LOADING ────────────────────────────────────── */
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+}
+
+/* ── TABS ───────────────────────────────────────── */
+.view-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 36px;
+  margin-bottom: 44px;
+}
+
+.tab {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 6px 2px;
+  position: relative;
+  transition: color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tab:hover { color: var(--text-2); }
+.tab.active { color: var(--text); }
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 1px;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+
+/* ── VIEWS ──────────────────────────────────────── */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── STATS VIEW ─────────────────────────────────── */
+.overall-heatmap {
+  margin-bottom: 48px;
+  padding-bottom: 36px;
+  border-bottom: 1px solid var(--line);
+}
+
+.cat-stats {
+  margin-bottom: 44px;
+  opacity: 0;
+  animation: fadeUp 0.45s ease forwards;
+}
+
+#statsView.active .cat-stats:nth-child(1) { animation-delay: 0.05s; }
+#statsView.active .cat-stats:nth-child(2) { animation-delay: 0.12s; }
+#statsView.active .cat-stats:nth-child(3) { animation-delay: 0.19s; }
+#statsView.active .cat-stats:nth-child(4) { animation-delay: 0.26s; }
+
+.cat-stats-header {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 14px;
+  padding: 0 4px;
+}
+
+.cat-stats-avg {
+  margin-left: auto;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 800;
+  font-size: 30px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.cat-stats-avg-unit {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  margin-left: 2px;
+  letter-spacing: 0.08em;
+  font-weight: 400;
+}
+
+.cat-heatmap {
+  display: grid;
+  grid-template-columns: repeat(28, 1fr);
+  gap: 3px;
+  margin-bottom: 18px;
+}
+
+.habit-rates {
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.habit-rate {
+  display: grid;
+  grid-template-columns: 1fr 90px 44px;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.habit-rate-name {
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-2);
+  letter-spacing: 0.005em;
+}
+
+.habit-rate-bar {
+  height: 2px;
+  background: var(--line);
+  position: relative;
+  overflow: hidden;
+}
+
+.habit-rate-bar-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.habit-rate-pct {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}
+
+/* ── MOBILE ─────────────────────────────────────── */
+@media (max-width: 480px) {
+  body { padding: 24px 18px 60px; }
+  .progress-track { width: 140px; }
+  .habit-text { font-size: 15.5px; }
+  .stat-value { font-size: 30px; }
+  .heatmap-grid { gap: 2px; }
+  .cat-heatmap { gap: 2px; }
+  .habit-rate { grid-template-columns: 1fr 56px 38px; gap: 10px; }
+  .habit-rate-name { font-size: 13.5px; }
+  .view-tabs { gap: 24px; }
+  .cat-stats-avg { font-size: 24px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="date" id="date">—</div>
+    <h1>LOCK IN</h1>
+    <div class="progress-bar">
+      <span id="progressCount" class="progress-count">0 / 17</span>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <span id="progressPct">0%</span>
+    </div>
+  </header>
+
+  <nav class="view-tabs">
+    <button class="tab active" data-view="today">Today</button>
+    <button class="tab" data-view="stats">Stats</button>
+  </nav>
+
+  <div class="view active" id="todayView">
+    <main id="main">
+      <div class="loading">Loading…</div>
+    </main>
+
+    <div class="stats" id="stats" style="display:none;">
+      <div>
+        <div class="stat-label">Today</div>
+        <div class="stat-value" id="statToday">0<span class="stat-unit">%</span></div>
+      </div>
+      <div>
+        <div class="stat-label">Streak</div>
+        <div class="stat-value" id="statStreak">0<span class="stat-unit">d</span></div>
+      </div>
+      <div>
+        <div class="stat-label">7-day Avg</div>
+        <div class="stat-value" id="statWeek">0<span class="stat-unit">%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="view" id="statsView">
+    <div class="overall-heatmap">
+      <div class="heatmap-title">Overall · Last 28 Days</div>
+      <div class="heatmap-grid" id="heatmapGrid"></div>
+    </div>
+    <div id="catStatsContainer"></div>
+  </div>
+
+  <div class="epigraph">
+    "Discipline is choosing between what you want now and what you want most."
+    <span class="epigraph-cite">— Abraham Lincoln (attr.)</span>
+  </div>
+</div>
+
+<script>
+const HABITS = [
+  { cat: 'morning', items: [
+    { id: 'nophone_am',  text: 'No Phone' },
+    { id: 'prayer',      text: 'Prayer' },
+    { id: 'lectio',      text: 'Lectio & Journal' },
+    { id: 'memorize',    text: 'Memorize Scripture' },
+    { id: 'bible',       text: 'Bible Study' },
+  ]},
+  { cat: 'fitness', items: [
+    { id: 'protein',     text: 'Tracked Nutrition' },
+    { id: 'steps',       text: '10,000 Steps' },
+    { id: 'gym',         text: 'Gym',  meta: '4× / wk', weekly: true },
+    { id: 'hike',        text: 'Hike', meta: '1× / wk', weekly: true },
+  ]},
+  { cat: 'dopamine', items: [
+    { id: 'noporn',      text: 'No Corn' },
+    { id: 'noscroll',    text: 'No Doomscrolling' },
+  ]},
+  { cat: 'night', items: [
+    { id: 'nophone_pm',  text: 'No Phone Before Bed' },
+    { id: 'teeth',       text: 'Floss & Brush' },
+    { id: 'journal',     text: 'Journal' },
+    { id: 'examen',      text: 'Examen & Compline' },
+    { id: 'log',         text: 'Log Habits' },
+  ]},
+];
+
+const CAT_META = {
+  morning:  { numeral: 'I.',   title: 'Morning' },
+  fitness:  { numeral: 'II.',  title: 'Fitness' },
+  dopamine: { numeral: 'III.', title: 'Dopamine' },
+  night:    { numeral: 'IV.',  title: 'Night' },
+};
+
+const TOTAL = HABITS.reduce((n, c) => n + c.items.length, 0);
+const STREAK_THRESHOLD = 0.80;
+
+function dKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function todayKey() { return `day:${dKey(new Date())}`; }
+function formatDate(d) {
+  return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase()
+    + ' · ' + d.getFullYear();
+}
+
+const ALL_IDS = HABITS.flatMap(c => c.items.map(it => it.id));
+const DAILY_IDS = HABITS.flatMap(c => c.items.filter(it => !it.weekly).map(it => it.id));
+
+// Storage adapter: Claude artifacts use storage, deployed site uses localStorage.
+const storage = (typeof window !== 'undefined' && window.storage) ? window.storage : {
+  async get(key) {
+    const v = localStorage.getItem(key);
+    return v === null ? null : { key, value: v, shared: false };
+  },
+  async set(key, value) {
+    localStorage.setItem(key, value);
+    return { key, value, shared: false };
+  },
+  async list(prefix) {
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && (!prefix || k.startsWith(prefix))) keys.push(k);
+    }
+    return { keys, prefix };
+  },
+  async delete(key) {
+    localStorage.removeItem(key);
+    return { key, deleted: true };
+  }
+};
+
+let state = new Set();
+let allDays = {};         // dKey -> Set<habitId>
+let statsViewDirty = true;
+
+function setupTabs() {
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const view = tab.dataset.view;
+      document.querySelectorAll('.tab').forEach(t =>
+        t.classList.toggle('active', t === tab));
+      document.querySelectorAll('.view').forEach(v =>
+        v.classList.toggle('active', v.id === view + 'View'));
+      if (view === 'stats' && statsViewDirty) {
+        renderStatsView();
+        statsViewDirty = false;
+      }
+    });
+  });
+}
+
+async function loadToday() {
+  try {
+    const r = await storage.get(todayKey());
+    if (r && r.value) state = new Set(JSON.parse(r.value));
+  } catch (e) {
+    state = new Set();
+  }
+}
+
+async function saveToday() {
+  try {
+    await storage.set(todayKey(), JSON.stringify([...state]));
+  } catch (e) {
+    console.error('Save failed:', e);
+  }
+}
+
+async function loadAllDays() {
+  allDays = {};
+  try {
+    const list = await storage.list('day:');
+    if (list && list.keys) {
+      for (const key of list.keys) {
+        try {
+          const r = await storage.get(key);
+          if (r && r.value) {
+            allDays[key.replace('day:', '')] = new Set(JSON.parse(r.value));
+          }
+        } catch (e) {}
+      }
+    }
+  } catch (e) {}
+  syncTodayCache();
+}
+
+function syncTodayCache() {
+  allDays[dKey(new Date())] = new Set(state);
+}
+
+function pctForDay(key, habitIds) {
+  const completed = allDays[key];
+  if (!completed || habitIds.length === 0) return 0;
+  let count = 0;
+  for (const id of habitIds) if (completed.has(id)) count++;
+  return count / habitIds.length;
+}
+
+function levelFromPct(pct) {
+  if (pct >= 0.95) return 4;
+  if (pct >= 0.7)  return 3;
+  if (pct >= 0.4)  return 2;
+  if (pct > 0)     return 1;
+  return 0;
+}
+
+function render() {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+
+  HABITS.forEach(({ cat, items }) => {
+    const meta = CAT_META[cat];
+    const done = items.filter(it => state.has(it.id)).length;
+
+    const section = document.createElement('section');
+    section.className = 'category';
+    section.innerHTML = `
+      <div class="category-header">
+        <span class="category-numeral">${meta.numeral}</span>
+        <span class="category-title">${meta.title}</span>
+        <span class="category-progress">${done} / ${items.length}</span>
+      </div>
+      <ul class="habits-list">
+        ${items.map(it => `
+          <li class="habit ${state.has(it.id) ? 'done' : ''}" data-id="${it.id}">
+            <div class="checkbox"></div>
+            <span class="habit-text">${it.text}</span>
+            ${it.meta ? `<span class="habit-meta">${it.meta}</span>` : ''}
+          </li>
+        `).join('')}
+      </ul>
+    `;
+    main.appendChild(section);
+  });
+
+  main.querySelectorAll('.habit').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = el.dataset.id;
+      if (state.has(id)) state.delete(id); else state.add(id);
+      syncTodayCache();
+      render();
+      updateProgress();
+      renderTodayStats();
+      statsViewDirty = true;
+      saveToday(); // fire-and-forget; don't block UI on storage write
+    });
+  });
+
+  updateProgress();
+}
+
+function updateProgress() {
+  const done = state.size;
+  const pct = Math.round((done / TOTAL) * 100);
+  document.getElementById('progressCount').textContent = `${done} / ${TOTAL}`;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('statToday').innerHTML = `${pct}<span class="stat-unit">%</span>`;
+}
+
+function renderTodayStats() {
+  // 7-day average — daily habits only (weekly habits excluded so they don't drag the average)
+  let sum = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    sum += pctForDay(dKey(d), DAILY_IDS);
+  }
+  const avg = Math.round((sum / 7) * 100);
+  document.getElementById('statWeek').innerHTML = `${avg}<span class="stat-unit">%</span>`;
+
+  // Streak: consecutive days where daily-habit completion >= threshold
+  // (12 of 15 daily habits = locked-in day; gym/hike are weekly targets)
+  let streak = 0;
+  const todayPct = pctForDay(dKey(new Date()), DAILY_IDS);
+  const startOffset = todayPct >= STREAK_THRESHOLD ? 0 : 1;
+  for (let i = startOffset; i < 365; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    if (pctForDay(dKey(d), DAILY_IDS) >= STREAK_THRESHOLD) streak++;
+    else break;
+  }
+  document.getElementById('statStreak').innerHTML =
+    `${streak}<span class="stat-unit">d</span>`;
+
+  document.getElementById('stats').style.display = 'grid';
+}
+
+function buildHeatmap(habitIds) {
+  const todayStr = dKey(new Date());
+  let html = '';
+  for (let i = 27; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const k = dKey(d);
+    const pct = pctForDay(k, habitIds);
+    const level = levelFromPct(pct);
+    html += `<div class="heatmap-cell${k === todayStr ? ' today' : ''}" data-level="${level}" title="${k} — ${Math.round(pct * 100)}%"></div>`;
+  }
+  return html;
+}
+
+function renderStatsView() {
+  // Overall heatmap (daily habits — bright = daily lock-in)
+  document.getElementById('heatmapGrid').innerHTML = buildHeatmap(DAILY_IDS);
+
+  const container = document.getElementById('catStatsContainer');
+  container.innerHTML = '';
+
+  HABITS.forEach(({ cat, items }) => {
+    const meta = CAT_META[cat];
+    const ids = items.map(it => it.id);
+
+    // 28-day average for category
+    let sum = 0;
+    for (let i = 0; i < 28; i++) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      sum += pctForDay(dKey(d), ids);
+    }
+    const avg = Math.round((sum / 28) * 100);
+
+    // Per-habit completion rates over 28 days
+    const habitRates = items.map(it => {
+      let count = 0;
+      for (let i = 0; i < 28; i++) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        const set = allDays[dKey(d)];
+        if (set && set.has(it.id)) count++;
+      }
+      return { ...it, rate: count / 28 };
+    });
+
+    const section = document.createElement('section');
+    section.className = 'cat-stats';
+    section.innerHTML = `
+      <div class="cat-stats-header">
+        <span class="category-numeral">${meta.numeral}</span>
+        <span class="category-title">${meta.title}</span>
+        <span class="cat-stats-avg">${avg}<span class="cat-stats-avg-unit">%</span></span>
+      </div>
+      <div class="cat-heatmap">${buildHeatmap(ids)}</div>
+      <ul class="habit-rates">
+        ${habitRates.map(h => {
+          const pct = Math.round(h.rate * 100);
+          return `
+            <li class="habit-rate">
+              <span class="habit-rate-name">${h.text}</span>
+              <span class="habit-rate-bar"><span class="habit-rate-bar-fill" style="width:${pct}%"></span></span>
+              <span class="habit-rate-pct">${pct}%</span>
+            </li>
+          `;
+        }).join('')}
+      </ul>
+    `;
+    container.appendChild(section);
+  });
+}
+
+async function init() {
+  document.getElementById('date').textContent = formatDate(new Date());
+  setupTabs();
+  await loadToday();
+  await loadAllDays();
+  render();
+  renderTodayStats();
+  renderStatsView();
+  statsViewDirty = false;
+}
+
+init();
+</script>
+</body>
+</html>
