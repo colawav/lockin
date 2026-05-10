@@ -1,0 +1,15 @@
+{
+  "name": "Lock In",
+  "short_name": "Lock In",
+  "description": "Daily habit tracker",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4ebd8",
+  "theme_color": "#f4ebd8",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icon.png",      "sizes": "180x180", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png",  "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png",  "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
