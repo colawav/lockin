@@ -6,6 +6,7 @@
 <meta name="color-scheme" content="light only">
 <meta name="theme-color" content="#f4ebd8">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Baseline">
 <link rel="manifest" href="/manifest.webmanifest">
@@ -944,6 +945,135 @@ h1 {
   position: relative;
 }
 
+/* ── DAY DETAIL MODAL ───────────────────────────── */
+.heatmap-cell { cursor: pointer; }
+
+.day-detail-date {
+  font-family: 'Space Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.day-detail-summary {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 800;
+  font-size: 40px;
+  color: var(--accent);
+  text-align: center;
+  line-height: 1;
+  margin-bottom: 4px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.day-detail-summary-unit {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  margin-left: 4px;
+  font-weight: 700;
+}
+
+.day-detail-fraction {
+  font-family: 'Space Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 26px;
+  font-variant-numeric: tabular-nums;
+}
+
+.day-detail-section { margin-bottom: 24px; }
+.day-detail-section:last-child { margin-bottom: 0; }
+
+.day-detail-section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding: 0 2px;
+}
+
+.day-detail-section-numeral {
+  font-family: 'Bowlby One', sans-serif;
+  font-size: 15px;
+  color: var(--accent);
+  min-width: 24px;
+}
+
+.day-detail-section-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  font-weight: 700;
+}
+
+.day-detail-section-count {
+  margin-left: auto;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+.day-detail-list {
+  list-style: none;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.day-detail-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 4px;
+  border-bottom: 1px solid var(--line);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+  font-size: 14.5px;
+  color: var(--text-2);
+}
+
+.day-detail-list li .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line-2);
+  flex-shrink: 0;
+}
+
+.day-detail-list li.hit .dot {
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+
+.day-detail-list li.hit { color: var(--text); }
+
+.day-detail-list li.miss .dot {
+  background: transparent;
+  border: 1px solid var(--line-2);
+}
+
+.day-detail-empty {
+  font-family: 'Nunito', sans-serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 14.5px;
+  color: var(--muted);
+  text-align: center;
+  padding: 30px 10px;
+}
+
 /* ── EPIGRAPH ───────────────────────────────────── */
 .epigraph {
   margin-top: 48px;
@@ -1450,7 +1580,7 @@ h1 {
 <div class="modal-backdrop" id="teethModal" hidden>
   <div class="modal-card">
     <button class="modal-close" data-modal-close aria-label="Close">×</button>
-    <h2 class="modal-section-title">Floss & Brush</h2>
+    <h2 class="modal-section-title">Floss</h2>
     <p class="modal-intro">Small acts of care, repeated, become a life.</p>
 
     <div class="modal-block">
@@ -1462,6 +1592,17 @@ h1 {
     </div>
 
     <p class="modal-coda">It's two minutes. Don't skip it.</p>
+  </div>
+</div>
+
+<!-- Day Detail -->
+<div class="modal-backdrop" id="dayDetailModal" hidden>
+  <div class="modal-card">
+    <button class="modal-close" data-modal-close aria-label="Close">×</button>
+    <div class="day-detail-date" id="dayDetailDate">—</div>
+    <div class="day-detail-summary" id="dayDetailSummary">0<span class="day-detail-summary-unit">%</span></div>
+    <div class="day-detail-fraction" id="dayDetailFraction">— / —</div>
+    <div id="dayDetailBody"></div>
   </div>
 </div>
 
@@ -1699,7 +1840,7 @@ const HABITS = [
   ]},
   { cat: 'night', items: [
     { id: 'nophone_pm',  text: 'No Phone Before Bed', modal: 'nophonePm' },
-    { id: 'teeth',       text: 'Floss & Brush', modal: 'teeth' },
+    { id: 'teeth',       text: 'Floss', modal: 'teeth' },
     { id: 'examen',      text: 'Examen & Compline', modal: 'examen' },
     { id: 'priorities',  text: 'Priorities', modal: 'priorities' },
     { id: 'log',         text: 'Log Habits', modal: 'log' },
@@ -2148,9 +2289,57 @@ function buildHeatmap(habitIds, days) {
     const k = dKey(d);
     const pct = pctForDay(k, habitIds);
     const level = levelFromPct(pct);
-    html += `<div class="heatmap-cell${k === todayStr ? ' today' : ''}" data-level="${level}" title="${k} — ${Math.round(pct * 100)}%"></div>`;
+    html += `<div class="heatmap-cell${k === todayStr ? ' today' : ''}" data-level="${level}" data-date="${k}" title="${k} — ${Math.round(pct * 100)}%"></div>`;
   }
   return html;
+}
+
+function formatDayDetailDate(key) {
+  const [y, m, d] = key.split('-').map(n => parseInt(n, 10));
+  const date = new Date(y, m - 1, d);
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long', month: 'long', day: 'numeric'
+  }).toUpperCase() + ' · ' + date.getFullYear();
+}
+
+function renderDayDetail(dateKey) {
+  const completed = allDays[dateKey] || new Set();
+  const totalDaily = DAILY_IDS.length;
+  const doneDaily = DAILY_IDS.filter(id => completed.has(id)).length;
+  const pct = totalDaily > 0 ? Math.round((doneDaily / totalDaily) * 100) : 0;
+
+  document.getElementById('dayDetailDate').textContent = formatDayDetailDate(dateKey);
+  document.getElementById('dayDetailSummary').innerHTML = `${pct}<span class="day-detail-summary-unit">%</span>`;
+  document.getElementById('dayDetailFraction').textContent = `${doneDaily} / ${totalDaily} daily habits`;
+
+  const body = document.getElementById('dayDetailBody');
+
+  // If we have no data for this day at all, show empty state
+  const hasAnyData = completed.size > 0;
+  if (!hasAnyData) {
+    body.innerHTML = `<div class="day-detail-empty">No habits logged on this day.</div>`;
+    return;
+  }
+
+  body.innerHTML = HABITS.map(({ cat, items }) => {
+    const meta = CAT_META[cat];
+    const hits = items.filter(it => completed.has(it.id)).length;
+    return `
+      <section class="day-detail-section">
+        <div class="day-detail-section-header">
+          <span class="day-detail-section-numeral">${meta.numeral}</span>
+          <span class="day-detail-section-title">${meta.title}</span>
+          <span class="day-detail-section-count">${hits} / ${items.length}</span>
+        </div>
+        <ul class="day-detail-list">
+          ${items.map(it => {
+            const hit = completed.has(it.id);
+            return `<li class="${hit ? 'hit' : 'miss'}"><span class="dot"></span>${it.text}${it.weekly ? ` · ${it.meta}` : ''}</li>`;
+          }).join('')}
+        </ul>
+      </section>
+    `;
+  }).join('');
 }
 
 function setHeatmapColumns(grid, days) {
@@ -2341,6 +2530,14 @@ async function init() {
   // Backup buttons
   document.getElementById('exportBtn').addEventListener('click', exportData);
   document.getElementById('importBtn').addEventListener('click', importData);
+
+  // Heatmap cell clicks → day detail modal (event delegation on the stats view)
+  document.getElementById('statsView').addEventListener('click', (e) => {
+    const cell = e.target.closest('.heatmap-cell');
+    if (!cell || !cell.dataset.date) return;
+    renderDayDetail(cell.dataset.date);
+    openModal('dayDetail');
+  });
 }
 
 init();
