@@ -1042,6 +1042,20 @@ h1 {
   font-weight: 600;
   font-size: 14.5px;
   color: var(--text-2);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease;
+}
+
+.day-detail-list li:active {
+  background: var(--accent-soft);
+}
+
+@media (hover: hover) {
+  .day-detail-list li:hover {
+    background: var(--accent-soft);
+  }
 }
 
 .day-detail-list li .dot {
@@ -2314,13 +2328,6 @@ function renderDayDetail(dateKey) {
 
   const body = document.getElementById('dayDetailBody');
 
-  // If we have no data for this day at all, show empty state
-  const hasAnyData = completed.size > 0;
-  if (!hasAnyData) {
-    body.innerHTML = `<div class="day-detail-empty">No habits logged on this day.</div>`;
-    return;
-  }
-
   body.innerHTML = HABITS.map(({ cat, items }) => {
     const meta = CAT_META[cat];
     const hits = items.filter(it => completed.has(it.id)).length;
@@ -2334,12 +2341,94 @@ function renderDayDetail(dateKey) {
         <ul class="day-detail-list">
           ${items.map(it => {
             const hit = completed.has(it.id);
-            return `<li class="${hit ? 'hit' : 'miss'}"><span class="dot"></span>${it.text}${it.weekly ? ` · ${it.meta}` : ''}</li>`;
+            return `<li class="${hit ? 'hit' : 'miss'}" data-habit-id="${it.id}"><span class="dot"></span>${it.text}${it.weekly ? ` · ${it.meta}` : ''}</li>`;
           }).join('')}
         </ul>
       </section>
     `;
   }).join('');
+
+  // Wire up tap-to-toggle on each habit row
+  body.querySelectorAll('.day-detail-list li').forEach(li => {
+    li.addEventListener('click', () => {
+      toggleHabitOnDate(dateKey, li.dataset.habitId);
+    });
+  });
+}
+
+function toggleHabitOnDate(dateKey, habitId) {
+  if (!allDays[dateKey]) allDays[dateKey] = new Set();
+  const set = allDays[dateKey];
+  if (set.has(habitId)) set.delete(habitId);
+  else set.add(habitId);
+
+  // If editing today, keep `state` (the today set) in sync
+  const todayK = dKey(new Date());
+  if (dateKey === todayK) {
+    state = new Set(set);
+  }
+
+  // Persist this day to storage (delete the key entirely if empty)
+  saveDayToStorage(dateKey);
+
+  // Re-render the day detail modal in place (updates % and rows)
+  renderDayDetail(dateKey);
+
+  // Update any heatmap cells showing this date (overall + category grids)
+  refreshHeatmapCellsForDate(dateKey);
+
+  // If editing today, also refresh the Today view + stats
+  if (dateKey === todayK) {
+    syncTodayCache();
+    // Update today's checkbox states without full re-render
+    document.querySelectorAll('#main .habit').forEach(el => {
+      const isDone = state.has(el.dataset.id);
+      el.classList.toggle('done', isDone);
+    });
+    // Update category counters in today view
+    document.querySelectorAll('#main .category').forEach(section => {
+      const items = section.querySelectorAll('.habit');
+      const doneCount = section.querySelectorAll('.habit.done').length;
+      const counter = section.querySelector('.category-progress');
+      if (counter) counter.textContent = `${doneCount} / ${items.length}`;
+    });
+    updateProgress();
+    renderTodayStats();
+  }
+}
+
+async function saveDayToStorage(dateKey) {
+  try {
+    const set = allDays[dateKey];
+    if (!set || set.size === 0) {
+      await storage.delete(`day:${dateKey}`);
+      delete allDays[dateKey];
+    } else {
+      await storage.set(`day:${dateKey}`, JSON.stringify([...set]));
+    }
+  } catch (e) {
+    console.error('Save failed:', e);
+  }
+}
+
+function refreshHeatmapCellsForDate(dateKey) {
+  document.querySelectorAll(`.heatmap-cell[data-date="${dateKey}"]`).forEach(cell => {
+    const grid = cell.parentElement;
+    let ids;
+    if (grid && grid.id === 'heatmapGrid') {
+      ids = DAILY_IDS;
+    } else if (grid && grid.classList.contains('cat-heatmap')) {
+      const cat = grid.dataset.cat;
+      const catEntry = HABITS.find(h => h.cat === cat);
+      if (!catEntry) return;
+      ids = catEntry.items.map(it => it.id);
+    } else {
+      return;
+    }
+    const pct = pctForDay(dateKey, ids);
+    cell.dataset.level = levelFromPct(pct);
+    cell.title = `${dateKey} — ${Math.round(pct * 100)}%`;
+  });
 }
 
 function setHeatmapColumns(grid, days) {
@@ -2393,7 +2482,7 @@ function renderStatsView() {
         <span class="category-title">${meta.title}</span>
         <span class="cat-stats-avg">${avg}<span class="cat-stats-avg-unit">%</span></span>
       </div>
-      <div class="cat-heatmap"></div>
+      <div class="cat-heatmap" data-cat="${cat}"></div>
       <ul class="habit-rates">
         ${habitRates.map(h => {
           const pct = Math.round(h.rate * 100);
