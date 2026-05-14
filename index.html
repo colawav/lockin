@@ -1815,8 +1815,8 @@ const HABITS = [
     { id: 'protein',     text: 'Tracked Nutrition', link: 'shortcuts://run-shortcut?name=Open%20MacroFactor' },
     { id: 'steps',       text: '10,000 Steps', link: 'x-apple-health://' },
     { id: 'fast',        text: '14 Hour Fast', modal: 'fast' },
-    { id: 'gym',         text: 'Gym',  meta: '4× / wk', weekly: true },
-    { id: 'hike',        text: 'Hike', meta: '1× / wk', weekly: true },
+    { id: 'gym',         text: 'Gym',  meta: '4× / wk', weekly: true, weeklyTarget: 4 },
+    { id: 'hike',        text: 'Hike', meta: '1× / wk', weekly: true, weeklyTarget: 1 },
   ]},
   { cat: 'dopamine', items: [
     { id: 'noporn',      text: 'Clean Day', modal: 'corn' },
@@ -2424,15 +2424,9 @@ function renderStatsView() {
     const meta = CAT_META[cat];
     const ids = items.map(it => it.id);
 
-    // Window-day average for category
-    let sum = 0;
-    for (let i = 0; i < win; i++) {
-      const d = new Date(); d.setDate(d.getDate() - i);
-      sum += pctForDay(dKey(d), ids);
-    }
-    const avg = Math.round((sum / win) * 100);
-
-    // Per-habit completion rates over window
+    // Per-habit completion rates over window — each habit normalized correctly:
+    //   • Daily habits → hits / window-days
+    //   • Weekly habits → hits / (weeklyTarget × weeks-in-window), capped at 100%
     const habitRates = items.map(it => {
       let count = 0;
       for (let i = 0; i < win; i++) {
@@ -2440,8 +2434,20 @@ function renderStatsView() {
         const set = allDays[dKey(d)];
         if (set && set.has(it.id)) count++;
       }
-      return { ...it, rate: count / win };
+      let rate;
+      if (it.weekly && it.weeklyTarget) {
+        const expected = it.weeklyTarget * (win / 7);
+        rate = expected > 0 ? Math.min(1, count / expected) : 0;
+      } else {
+        rate = count / win;
+      }
+      return { ...it, rate };
     });
+
+    // Category average = mean of per-habit rates (so weekly habits count fairly)
+    const avg = items.length > 0
+      ? Math.round((habitRates.reduce((s, h) => s + h.rate, 0) / items.length) * 100)
+      : 0;
 
     const section = document.createElement('section');
     section.className = 'cat-stats';
