@@ -923,6 +923,66 @@ h1 {
   position: relative;
 }
 
+/* Custom days dropdown — styled to match pills, opens native picker on iOS */
+.window-select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+  margin-left: -1px;
+}
+.window-select-wrap::after {
+  content: '▾';
+  position: absolute;
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: var(--muted);
+  pointer-events: none;
+  font-family: 'Space Mono', monospace;
+}
+.window-select-wrap.active::after { color: var(--bg); }
+
+.window-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: transparent;
+  background-image: none;
+  font-family: 'Space Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid var(--line-2);
+  padding: 8px 22px 8px 13px;
+  margin: 0;
+  border-radius: 0;
+  outline: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  text-align: left;
+  text-align-last: left;
+  text-shadow: none;
+  line-height: 1;
+  transition: all 0.18s ease;
+}
+.window-select::-ms-expand { display: none; }
+.window-select:focus { outline: none; }
+.window-select.active {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+.window-select option {
+  color: var(--text);
+  background: var(--bg);
+  font-family: 'Space Mono', monospace;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
 .heatmap-cell {
   aspect-ratio: 1;
   background: var(--line);
@@ -1324,6 +1384,7 @@ h1 {
       <button class="window-pill active" data-days="28">28D</button>
       <button class="window-pill" data-days="90">90D</button>
       <button class="window-pill" data-days="all">All</button>
+      <span class="window-select-wrap"><select class="window-select" id="customDaysSelect" aria-label="Custom days"></select></span>
     </div>
     <div class="overall-heatmap">
       <div class="heatmap-title" id="overallHeatmapTitle">Overall · Last 28 Days</div>
@@ -2032,9 +2093,11 @@ const storage = (typeof window !== 'undefined' && window.storage) ? window.stora
 let state = new Set();
 let allDays = {};         // dKey -> Set<habitId>
 let statsViewDirty = true;
-let statsWindow = 28;     // 7, 28, 90, or 'all'
+let statsWindow = 28;     // 7, 14, 28, 90, 'all', or 'custom'
+let customDays = 21;      // active value when statsWindow === 'custom'
 
 function getEffectiveWindow() {
+  if (statsWindow === 'custom') return Math.max(1, Math.min(365, customDays));
   if (statsWindow !== 'all') return statsWindow;
   // Find the earliest day with data; fall back to 28 if no history
   const keys = Object.keys(allDays).sort();
@@ -2049,6 +2112,9 @@ function getWindowLabel() {
   if (statsWindow === 'all') {
     const eff = getEffectiveWindow();
     return `All Time · ${eff}d`;
+  }
+  if (statsWindow === 'custom') {
+    return `Last ${customDays} Days`;
   }
   return `Last ${statsWindow} Days`;
 }
@@ -2074,8 +2140,43 @@ function setupTabs() {
       statsWindow = days === 'all' ? 'all' : parseInt(days, 10);
       document.querySelectorAll('.window-pill').forEach(p =>
         p.classList.toggle('active', p === pill));
+      // Reset the custom select & wrap to their inactive state
+      const selEl = document.getElementById('customDaysSelect');
+      if (selEl) {
+        selEl.value = '';
+        selEl.classList.remove('active');
+        selEl.parentElement.classList.remove('active');
+      }
       renderStatsView();
     });
+  });
+
+  // Populate custom days dropdown (1–365)
+  const sel = document.getElementById('customDaysSelect');
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = '···';
+  placeholder.disabled = true;
+  sel.appendChild(placeholder);
+  for (let i = 1; i <= 365; i++) {
+    const opt = document.createElement('option');
+    opt.value = String(i);
+    opt.textContent = `${i}D`;
+    sel.appendChild(opt);
+  }
+  sel.value = '';
+
+  sel.addEventListener('change', () => {
+    const n = parseInt(sel.value, 10);
+    if (!Number.isFinite(n) || n < 1) return;
+    customDays = n;
+    statsWindow = 'custom';
+    // Deactivate all preset pills
+    document.querySelectorAll('.window-pill').forEach(p => p.classList.remove('active'));
+    // Activate the select + its wrap (for the caret color)
+    sel.classList.add('active');
+    sel.parentElement.classList.add('active');
+    renderStatsView();
   });
 }
 
