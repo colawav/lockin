@@ -2096,16 +2096,23 @@ let statsViewDirty = true;
 let statsWindow = 28;     // 7, 14, 28, 90, 'all', or 'custom'
 let customDays = 21;      // active value when statsWindow === 'custom'
 
+// Tracking baseline — anchor for "All Time" window
+const TRACKING_START = '2026-05-11';
+
+function daysSinceTrackingStart() {
+  const [y, m, d] = TRACKING_START.split('-').map(n => parseInt(n, 10));
+  const start = new Date(y, m - 1, d);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  start.setHours(0, 0, 0, 0);
+  const days = Math.round((today - start) / 86400000) + 1;
+  return Math.max(1, Math.min(days, 365));
+}
+
 function getEffectiveWindow() {
   if (statsWindow === 'custom') return Math.max(1, Math.min(365, customDays));
   if (statsWindow !== 'all') return statsWindow;
-  // Find the earliest day with data; fall back to 28 if no history
-  const keys = Object.keys(allDays).sort();
-  if (keys.length === 0) return 28;
-  const oldest = new Date(keys[0]);
-  const today = new Date();
-  const days = Math.ceil((today - oldest) / 86400000) + 1;
-  return Math.max(1, Math.min(days, 365));
+  return daysSinceTrackingStart();
 }
 
 function getWindowLabel() {
