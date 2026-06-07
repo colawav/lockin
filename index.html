@@ -1324,6 +1324,67 @@ h1 {
   font-weight: 500;
 }
 
+/* Tappable habit rows in the stats view */
+.habit-rate {
+  cursor: pointer;
+  transition: background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.habit-rate:active { background: var(--accent-soft); }
+@media (hover: hover) {
+  .habit-rate:hover { background: var(--accent-soft); }
+  .habit-rate:hover .habit-rate-name { color: var(--text); }
+}
+
+/* ── HABIT DETAIL MODAL ─────────────────────────── */
+.habit-detail-name {
+  font-family: 'Bowlby One', sans-serif;
+  font-weight: 400;
+  font-size: clamp(24px, 7vw, 32px);
+  line-height: 1.05;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.habit-detail-sub {
+  font-family: 'Space Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.habit-detail-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.habit-detail-heatwrap { margin-bottom: 26px; }
+.habit-detail-heatwrap .heatmap-title { margin-bottom: 12px; }
+#habitDetailHeat .heatmap-cell { cursor: pointer; }
+
+.habit-detail-footer {
+  font-family: 'Space Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  line-height: 1.9;
+  font-variant-numeric: tabular-nums;
+}
+.habit-detail-footer strong { color: var(--text-2); font-weight: 700; }
+
 /* ── MOBILE ─────────────────────────────────────── */
 @media (max-width: 480px) {
   body { padding: 24px 18px 60px; }
@@ -1648,6 +1709,29 @@ h1 {
     <div class="day-detail-summary" id="dayDetailSummary">0<span class="day-detail-summary-unit">%</span></div>
     <div class="day-detail-fraction" id="dayDetailFraction">— / —</div>
     <div id="dayDetailBody"></div>
+  </div>
+</div>
+
+<!-- Habit Detail -->
+<div class="modal-backdrop" id="habitDetailModal" hidden>
+  <div class="modal-card">
+    <button class="modal-close" data-modal-close aria-label="Close">×</button>
+    <div class="habit-detail-name" id="habitDetailName">—</div>
+    <div class="habit-detail-sub" id="habitDetailSub">—</div>
+    <div class="window-toggle" id="habitWindowToggle">
+      <button class="window-pill" data-days="7">7D</button>
+      <button class="window-pill" data-days="14">14D</button>
+      <button class="window-pill active" data-days="28">28D</button>
+      <button class="window-pill" data-days="90">90D</button>
+      <button class="window-pill" data-days="all">All</button>
+      <span class="window-select-wrap"><select class="window-select" id="habitCustomDaysSelect" aria-label="Custom days"></select></span>
+    </div>
+    <div class="habit-detail-stats" id="habitDetailStats"></div>
+    <div class="habit-detail-heatwrap">
+      <div class="heatmap-title" id="habitDetailHeatTitle">—</div>
+      <div class="heatmap-grid" id="habitDetailHeat"></div>
+    </div>
+    <div class="habit-detail-footer" id="habitDetailFooter"></div>
   </div>
 </div>
 
@@ -2095,6 +2179,10 @@ let allDays = {};         // dKey -> Set<habitId>
 let statsViewDirty = true;
 let statsWindow = 28;     // 7, 14, 28, 90, 'all', or 'custom'
 let customDays = 21;      // active value when statsWindow === 'custom'
+let modalStack = [];      // open modal ids, bottom→top (enables stacked drill-in)
+let currentHabitDetailId = null;  // habit currently shown in the habit-detail modal
+let habitWindow = 28;     // window for the habit-detail view (independent of stats page)
+let habitCustomDays = 21; // active value when habitWindow === 'custom'
 
 // Tracking baseline — anchor for "All Time" window
 const TRACKING_START = '2026-05-11';
@@ -2326,14 +2414,31 @@ function render() {
 function openModal(id) {
   const modal = document.getElementById(id + 'Modal');
   if (!modal) return;
+  // Stack on top of anything already open so drill-ins (habit → day) layer correctly
+  modal.style.zIndex = String(100 + modalStack.length);
   modal.hidden = false;
   document.body.style.overflow = 'hidden';
   modal.scrollTop = 0;
+  modalStack.push(id);
   if (id === 'bible') renderBibleSets();
 }
 
+// Close just the top-most modal, returning to whatever was beneath it
+function closeTopModal() {
+  const id = modalStack.pop();
+  if (id) {
+    const modal = document.getElementById(id + 'Modal');
+    if (modal) { modal.hidden = true; modal.style.zIndex = ''; }
+  }
+  if (modalStack.length === 0) document.body.style.overflow = '';
+}
+
 function closeAllModals() {
-  document.querySelectorAll('.modal-backdrop').forEach(m => m.hidden = true);
+  modalStack = [];
+  document.querySelectorAll('.modal-backdrop').forEach(m => {
+    m.hidden = true;
+    m.style.zIndex = '';
+  });
   document.body.style.overflow = '';
 }
 
@@ -2454,6 +2559,12 @@ function toggleHabitOnDate(dateKey, habitId) {
   // Update any heatmap cells showing this date (overall + category grids)
   refreshHeatmapCellsForDate(dateKey);
 
+  // If a habit-detail view is stacked beneath this day view, refresh it too so
+  // its stats and heatmap are current when the user steps back to it
+  if (currentHabitDetailId && modalStack.includes('habitDetail')) {
+    renderHabitDetail(currentHabitDetailId);
+  }
+
   // If editing today, also refresh the Today view + stats
   if (dateKey === todayK) {
     syncTodayCache();
@@ -2570,7 +2681,7 @@ function renderStatsView() {
         ${habitRates.map(h => {
           const pct = Math.round(h.rate * 100);
           return `
-            <li class="habit-rate">
+            <li class="habit-rate" data-id="${h.id}">
               <span class="habit-rate-name">${h.text}</span>
               <span class="habit-rate-bar"><span class="habit-rate-bar-fill" style="width:${pct}%"></span></span>
               <span class="habit-rate-pct">${pct}%</span>
@@ -2585,6 +2696,192 @@ function renderStatsView() {
     setHeatmapColumns(catGrid, win);
     catGrid.innerHTML = buildHeatmap(ids, win);
   });
+}
+
+// ── HABIT DETAIL ────────────────────────────────────
+function parseTrackingStartDate() {
+  const [y, m, d] = TRACKING_START.split('-').map(n => parseInt(n, 10));
+  const dt = new Date(y, m - 1, d);
+  dt.setHours(0, 0, 0, 0);
+  return dt;
+}
+
+function findHabit(id) {
+  for (const c of HABITS) {
+    const it = c.items.find(x => x.id === id);
+    if (it) return { it, cat: c.cat };
+  }
+  return null;
+}
+
+function habitDoneOn(id, key) {
+  const set = allDays[key];
+  return !!(set && set.has(id));
+}
+
+function countHabitInWindow(id, win) {
+  let count = 0;
+  for (let i = 0; i < win; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    if (habitDoneOn(id, dKey(d))) count++;
+  }
+  return count;
+}
+
+function habitRateOverWindow(it, win) {
+  const count = countHabitInWindow(it.id, win);
+  if (it.weekly && it.weeklyTarget) {
+    const expected = it.weeklyTarget * (win / 7);
+    return expected > 0 ? Math.min(1, count / expected) : 0;
+  }
+  return win > 0 ? count / win : 0;
+}
+
+// Current streak — today counts if done; if today isn't done yet it's treated as
+// "in progress" (not a break), matching the app's overall streak logic.
+function habitCurrentStreak(id) {
+  let streak = 0;
+  const startOffset = habitDoneOn(id, dKey(new Date())) ? 0 : 1;
+  for (let i = startOffset; i < 365; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    if (habitDoneOn(id, dKey(d))) streak++;
+    else break;
+  }
+  return streak;
+}
+
+function habitLongestStreak(id) {
+  const cursor = parseTrackingStartDate();
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  let longest = 0, run = 0;
+  while (cursor <= today) {
+    if (habitDoneOn(id, dKey(cursor))) { run++; if (run > longest) longest = run; }
+    else run = 0;
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return longest;
+}
+
+function habitLastDone(id) {
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    if (habitDoneOn(id, dKey(d))) {
+      if (i === 0) return 'Today';
+      if (i === 1) return 'Yesterday';
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+  }
+  return 'Never';
+}
+
+function habitEffectiveWindow() {
+  if (habitWindow === 'custom') return Math.max(1, Math.min(365, habitCustomDays));
+  if (habitWindow !== 'all') return habitWindow;
+  return daysSinceTrackingStart();
+}
+
+function habitWindowLabel() {
+  if (habitWindow === 'all') return `All Time · ${habitEffectiveWindow()}d`;
+  if (habitWindow === 'custom') return `Last ${habitCustomDays} Days`;
+  return `Last ${habitWindow} Days`;
+}
+
+// Reflect the current habitWindow/habitCustomDays in the toggle UI
+function syncHabitWindowUI() {
+  const toggle = document.getElementById('habitWindowToggle');
+  const sel = document.getElementById('habitCustomDaysSelect');
+  if (!toggle || !sel) return;
+  if (habitWindow === 'custom') {
+    toggle.querySelectorAll('.window-pill').forEach(p => p.classList.remove('active'));
+    sel.value = String(habitCustomDays);
+    sel.classList.add('active');
+    sel.parentElement.classList.add('active');
+  } else {
+    sel.value = '';
+    sel.classList.remove('active');
+    sel.parentElement.classList.remove('active');
+    toggle.querySelectorAll('.window-pill').forEach(p => {
+      const d = p.dataset.days === 'all' ? 'all' : parseInt(p.dataset.days, 10);
+      p.classList.toggle('active', d === habitWindow);
+    });
+  }
+}
+
+function setupHabitWindowToggle() {
+  const toggle = document.getElementById('habitWindowToggle');
+  if (!toggle) return;
+  toggle.querySelectorAll('.window-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      const days = pill.dataset.days;
+      habitWindow = days === 'all' ? 'all' : parseInt(days, 10);
+      syncHabitWindowUI();
+      if (currentHabitDetailId) renderHabitDetail(currentHabitDetailId);
+    });
+  });
+
+  const sel = document.getElementById('habitCustomDaysSelect');
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = '···';
+  placeholder.disabled = true;
+  sel.appendChild(placeholder);
+  for (let i = 1; i <= 365; i++) {
+    const opt = document.createElement('option');
+    opt.value = String(i);
+    opt.textContent = `${i}D`;
+    sel.appendChild(opt);
+  }
+  sel.value = '';
+
+  sel.addEventListener('change', () => {
+    const n = parseInt(sel.value, 10);
+    if (!Number.isFinite(n) || n < 1) return;
+    habitCustomDays = n;
+    habitWindow = 'custom';
+    syncHabitWindowUI();
+    if (currentHabitDetailId) renderHabitDetail(currentHabitDetailId);
+  });
+}
+
+function renderHabitDetail(id) {
+  const found = findHabit(id);
+  if (!found) return;
+  const { it, cat } = found;
+  currentHabitDetailId = id;
+  const meta = CAT_META[cat];
+  const win = habitEffectiveWindow();
+
+  document.getElementById('habitDetailName').textContent = it.text;
+  document.getElementById('habitDetailSub').textContent = meta.title;
+
+  const rate = Math.round(habitRateOverWindow(it, win) * 100);
+  const doneInWin = countHabitInWindow(it.id, win);
+  const statsEl = document.getElementById('habitDetailStats');
+  const footer = document.getElementById('habitDetailFooter');
+
+  if (it.weekly && it.weeklyTarget) {
+    const last7 = countHabitInWindow(it.id, 7);
+    statsEl.innerHTML = `
+      <div><div class="stat-label">Rate</div><div class="stat-value">${rate}<span class="stat-unit">%</span></div></div>
+      <div><div class="stat-label">This Week</div><div class="stat-value">${last7}<span class="stat-unit">/ ${it.weeklyTarget}</span></div></div>
+      <div><div class="stat-label">Sessions</div><div class="stat-value">${doneInWin}</div></div>
+    `;
+    footer.innerHTML = `Last done · <strong>${habitLastDone(it.id)}</strong><br>${doneInWin} session${doneInWin === 1 ? '' : 's'} this window`;
+  } else {
+    const current = habitCurrentStreak(it.id);
+    const longest = habitLongestStreak(it.id);
+    statsEl.innerHTML = `
+      <div><div class="stat-label">Rate</div><div class="stat-value">${rate}<span class="stat-unit">%</span></div></div>
+      <div><div class="stat-label">Streak</div><div class="stat-value">${current}<span class="stat-unit">d</span></div></div>
+      <div><div class="stat-label">Longest</div><div class="stat-value">${longest}<span class="stat-unit">d</span></div></div>
+    `;
+    footer.innerHTML = `Last done · <strong>${habitLastDone(it.id)}</strong><br>Done <strong>${doneInWin}</strong> of ${win} days`;
+  }
+
+  document.getElementById('habitDetailHeatTitle').textContent = habitWindowLabel();
+  const heat = document.getElementById('habitDetailHeat');
+  setHeatmapColumns(heat, win);
+  heat.innerHTML = buildHeatmap([it.id], win);
 }
 
 // ── BACKUP / RESTORE ────────────────────────────────
@@ -2676,6 +2973,7 @@ function flashBackupMeta(msg) {
 async function init() {
   document.getElementById('date').textContent = formatDate(new Date());
   setupTabs();
+  setupHabitWindowToggle();
   await loadToday();
   await loadAllDays();
   render();
@@ -2684,17 +2982,17 @@ async function init() {
   renderQuote();
   statsViewDirty = false;
 
-  // Modal close handlers — generic for all modals
+  // Modal close handlers — close the top-most modal (back-stack aware)
   document.querySelectorAll('[data-modal-close]').forEach(btn => {
-    btn.addEventListener('click', closeAllModals);
+    btn.addEventListener('click', closeTopModal);
   });
   document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
     backdrop.addEventListener('click', (e) => {
-      if (e.target === backdrop) closeAllModals();
+      if (e.target === backdrop) closeTopModal();
     });
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeAllModals();
+    if (e.key === 'Escape') closeTopModal();
   });
 
   await loadBibleProgress();
@@ -2703,8 +3001,26 @@ async function init() {
   document.getElementById('exportBtn').addEventListener('click', exportData);
   document.getElementById('importBtn').addEventListener('click', importData);
 
-  // Heatmap cell clicks → day detail modal (event delegation on the stats view)
+  // Stats view taps: heatmap cell → day detail, habit rate row → habit detail
   document.getElementById('statsView').addEventListener('click', (e) => {
+    const cell = e.target.closest('.heatmap-cell');
+    if (cell && cell.dataset.date) {
+      renderDayDetail(cell.dataset.date);
+      openModal('dayDetail');
+      return;
+    }
+    const rateRow = e.target.closest('.habit-rate');
+    if (rateRow && rateRow.dataset.id) {
+      habitWindow = statsWindow;
+      habitCustomDays = customDays;
+      syncHabitWindowUI();
+      renderHabitDetail(rateRow.dataset.id);
+      openModal('habitDetail');
+    }
+  });
+
+  // Habit-detail heatmap taps → day detail, layered on top of the habit view
+  document.getElementById('habitDetailHeat').addEventListener('click', (e) => {
     const cell = e.target.closest('.heatmap-cell');
     if (!cell || !cell.dataset.date) return;
     renderDayDetail(cell.dataset.date);
