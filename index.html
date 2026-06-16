@@ -134,6 +134,7 @@ h1 {
 .category:nth-child(2) { animation-delay: 0.12s; }
 .category:nth-child(3) { animation-delay: 0.19s; }
 .category:nth-child(4) { animation-delay: 0.26s; }
+.category:nth-child(5) { animation-delay: 0.33s; }
 
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(8px); }
@@ -1947,9 +1948,67 @@ h1 {
   </div>
 </div>
 
+<!-- Up by 6 (morning) -->
+<div class="modal-backdrop" id="wakeModal" hidden>
+  <div class="modal-card">
+    <button class="modal-close" data-modal-close aria-label="Close">×</button>
+    <h2 class="modal-section-title">Up before 7</h2>
+    <p class="modal-intro">The wake time is the master switch. Set it, hold it, and the rest of your sleep — and a good piece of your day — organizes itself around it.</p>
+
+    <div class="modal-block">
+      <h3>The science</h3>
+      <p><strong>Light sets the clock.</strong> Your brain runs a master clock — the SCN — that calibrates to light hitting your eyes in the first hour awake. Morning light shuts off melatonin and timestamps the day. Wake at the same time daily and the clock stops drifting.</p>
+      <p><strong>The cortisol wave.</strong> Within ~30 minutes of waking, your body fires a natural cortisol surge — the engine behind morning alertness and drive. A consistent rise time sharpens that wave. Erratic waking flattens it, and you spend the morning in fog.</p>
+      <p><strong>Regularity rivals duration.</strong> A growing body of sleep research finds that <em>when</em> you sleep — the consistency of your wake time — predicts mood, focus, and metabolic health about as much as how long you sleep. You already get the 8 hours. Consistency is the lever still on the table.</p>
+    </div>
+
+    <div class="modal-block">
+      <h3>How it fixes your bedtime</h3>
+      <p>You can't will yourself asleep at 11 — but you can will yourself vertical before 7, and <strong>that's what drags the bedtime back.</strong> Hold the rise and sleep pressure (adenosine) builds on a fixed schedule all day, so by ~11pm you're genuinely tired instead of lying there waiting. Morning light also shifts your whole rhythm earlier, making the early night feel natural rather than forced.</p>
+      <p>Give it a week or two of holding the rise. The bedtime follows the wake time, never the reverse. You set the morning; the night sets itself.</p>
+    </div>
+
+    <div class="modal-block">
+      <h3>Why it's worth the cold start</h3>
+      <p>Getting up on time is really decided the night before, when you choose to wind down. Win that, and you've taken the first and hardest rep of the day before the world is even awake.</p>
+      <p>Nothing else on this list runs well from a late, rushed start — prayer, training, a clear head all sit downstream of getting up on time. Rule the first hour and you rule the day. You're not chasing a number on a clock; you're proving to yourself, every morning, that you do what you said you'd do. That's the whole project.</p>
+    </div>
+
+    <p class="modal-coda">"His mercies are new every morning; great is your faithfulness." — Lamentations 3:22–23</p>
+  </div>
+</div>
+
+<!-- Weekly Reflection (night) -->
+<div class="modal-backdrop" id="reflectModal" hidden>
+  <div class="modal-card">
+    <button class="modal-close" data-modal-close aria-label="Close">×</button>
+    <h2 class="modal-section-title">Weekly Reflection</h2>
+    <p class="modal-intro">Once a week, step back from the checkboxes and look at the trajectory. Not the day — the direction.</p>
+
+    <div class="modal-block">
+      <h3>A different altitude than the Examen</h3>
+      <p>The nightly Examen reviews a single day. This reviews a life in motion, seven days at a time. The question isn't <em>did I hit my habits</em> — it's <strong>is the man I'm becoming the man I want to be?</strong></p>
+      <p>It lives outside the daily streak on purpose. Missing it doesn't break a chain; it's reflection, not a rep.</p>
+    </div>
+
+    <div class="modal-block">
+      <h3>Sundays · ~60 minutes</h3>
+      <ul>
+        <li>Where did I grow this week, and where did I drift?</li>
+        <li>What did the numbers actually say — and what aren't they telling me?</li>
+        <li>One thing to carry forward. One thing to put down.</li>
+        <li>Is the scaffolding still serving the formation, or have I started serving the scaffolding?</li>
+      </ul>
+    </div>
+
+    <p class="modal-coda">"Search me, God, and know my heart; test me and know my anxious thoughts." — Psalm 139:23</p>
+  </div>
+</div>
+
 <script>
 const HABITS = [
   { cat: 'morning', items: [
+    { id: 'wake',        text: 'Up before 7', modal: 'wake', since: '2026-06-15' },
     { id: 'nophone_am',  text: 'No Phone', modal: 'nophoneAm' },
     { id: 'prayer',      text: 'Prayer', modal: 'prayer' },
     { id: 'lectio',      text: 'Lectio & Journal', link: 'shortcuts://run-shortcut?name=Open%20Journal' },
@@ -1973,6 +2032,9 @@ const HABITS = [
     { id: 'priorities',  text: 'Priorities', modal: 'priorities' },
     { id: 'log',         text: 'Log Habits', modal: 'log' },
   ]},
+  { cat: 'weekly', items: [
+    { id: 'reflect',     text: 'Reflection', meta: '1× / wk', weekly: true, weeklyTarget: 1, modal: 'reflect', since: '2026-06-15' },
+  ]},
 ];
 
 const CAT_META = {
@@ -1980,6 +2042,7 @@ const CAT_META = {
   fitness:  { numeral: 'II.',  title: 'Fitness' },
   dopamine: { numeral: 'III.', title: 'Dopamine' },
   night:    { numeral: 'IV.',  title: 'Night' },
+  weekly:   { numeral: 'V.',   title: 'Weekly' },
 };
 
 const TOTAL = HABITS.reduce((n, c) => n + c.items.length, 0);
@@ -1996,6 +2059,21 @@ function formatDate(d) {
 
 const ALL_IDS = HABITS.flatMap(c => c.items.map(it => it.id));
 const DAILY_IDS = HABITS.flatMap(c => c.items.filter(it => !it.weekly).map(it => it.id));
+
+// Per-habit start dates — habits added mid-stream don't count as misses before they existed.
+// A day-key (YYYY-MM-DD) sorts lexicographically, so string compare is a valid date compare.
+const SINCE = {};
+HABITS.forEach(c => c.items.forEach(it => { if (it.since) SINCE[it.id] = it.since; }));
+const activeOn = (id, key) => !SINCE[id] || key >= SINCE[id];
+const activeDaysInWindow = (id, win) => {
+  if (!SINCE[id]) return win;
+  let n = 0;
+  for (let i = 0; i < win; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    if (dKey(d) >= SINCE[id]) n++;
+  }
+  return n;
+};
 
 const QUOTES = [
   { text: 'Be still, and know that I am God.', cite: 'Psalm 46:10' },
@@ -2316,10 +2394,12 @@ function syncTodayCache() {
 
 function pctForDay(key, habitIds) {
   const completed = allDays[key];
-  if (!completed || habitIds.length === 0) return 0;
+  // Only count habits that had started by this day — newer habits don't retroactively dent history.
+  const ids = habitIds.filter(id => activeOn(id, key));
+  if (!completed || ids.length === 0) return 0;
   let count = 0;
-  for (const id of habitIds) if (completed.has(id)) count++;
-  return count / habitIds.length;
+  for (const id of ids) if (completed.has(id)) count++;
+  return count / ids.length;
 }
 
 function levelFromPct(pct) {
@@ -2500,8 +2580,9 @@ function formatDayDetailDate(key) {
 
 function renderDayDetail(dateKey) {
   const completed = allDays[dateKey] || new Set();
-  const totalDaily = DAILY_IDS.length;
-  const doneDaily = DAILY_IDS.filter(id => completed.has(id)).length;
+  const dailyActive = DAILY_IDS.filter(id => activeOn(id, dateKey));
+  const totalDaily = dailyActive.length;
+  const doneDaily = dailyActive.filter(id => completed.has(id)).length;
   const pct = totalDaily > 0 ? Math.round((doneDaily / totalDaily) * 100) : 0;
 
   document.getElementById('dayDetailDate').textContent = formatDayDetailDate(dateKey);
@@ -2512,16 +2593,18 @@ function renderDayDetail(dateKey) {
 
   body.innerHTML = HABITS.map(({ cat, items }) => {
     const meta = CAT_META[cat];
-    const hits = items.filter(it => completed.has(it.id)).length;
+    const shown = items.filter(it => activeOn(it.id, dateKey));
+    if (shown.length === 0) return '';
+    const hits = shown.filter(it => completed.has(it.id)).length;
     return `
       <section class="day-detail-section">
         <div class="day-detail-section-header">
           <span class="day-detail-section-numeral">${meta.numeral}</span>
           <span class="day-detail-section-title">${meta.title}</span>
-          <span class="day-detail-section-count">${hits} / ${items.length}</span>
+          <span class="day-detail-section-count">${hits} / ${shown.length}</span>
         </div>
         <ul class="day-detail-list">
-          ${items.map(it => {
+          ${shown.map(it => {
             const hit = completed.has(it.id);
             return `<li class="${hit ? 'hit' : 'miss'}" data-habit-id="${it.id}"><span class="dot"></span>${it.text}${it.weekly ? ` · ${it.meta}` : ''}</li>`;
           }).join('')}
@@ -2653,12 +2736,13 @@ function renderStatsView() {
         const set = allDays[dKey(d)];
         if (set && set.has(it.id)) count++;
       }
+      const activeDays = activeDaysInWindow(it.id, win);
       let rate;
       if (it.weekly && it.weeklyTarget) {
-        const expected = it.weeklyTarget * (win / 7);
+        const expected = it.weeklyTarget * (activeDays / 7);
         rate = expected > 0 ? Math.min(1, count / expected) : 0;
       } else {
-        rate = count / win;
+        rate = activeDays > 0 ? count / activeDays : 0;
       }
       return { ...it, rate };
     });
@@ -2730,11 +2814,12 @@ function countHabitInWindow(id, win) {
 
 function habitRateOverWindow(it, win) {
   const count = countHabitInWindow(it.id, win);
+  const winDays = activeDaysInWindow(it.id, win);
   if (it.weekly && it.weeklyTarget) {
-    const expected = it.weeklyTarget * (win / 7);
+    const expected = it.weeklyTarget * (winDays / 7);
     return expected > 0 ? Math.min(1, count / expected) : 0;
   }
-  return win > 0 ? count / win : 0;
+  return winDays > 0 ? count / winDays : 0;
 }
 
 // Current streak — today counts if done; if today isn't done yet it's treated as
@@ -2875,7 +2960,7 @@ function renderHabitDetail(id) {
       <div><div class="stat-label">Streak</div><div class="stat-value">${current}<span class="stat-unit">d</span></div></div>
       <div><div class="stat-label">Longest</div><div class="stat-value">${longest}<span class="stat-unit">d</span></div></div>
     `;
-    footer.innerHTML = `Last done · <strong>${habitLastDone(it.id)}</strong><br>Done <strong>${doneInWin}</strong> of ${win} days`;
+    footer.innerHTML = `Last done · <strong>${habitLastDone(it.id)}</strong><br>Done <strong>${doneInWin}</strong> of ${activeDaysInWindow(it.id, win)} days`;
   }
 
   document.getElementById('habitDetailHeatTitle').textContent = habitWindowLabel();
