@@ -2008,7 +2008,7 @@ h1 {
 <script>
 const HABITS = [
   { cat: 'morning', items: [
-    { id: 'wake',        text: 'Up before 7', modal: 'wake', since: '2026-06-15' },
+    { id: 'wake',        text: 'Up before 7', meta: '6× / wk', weekly: true, weeklyTarget: 6, modal: 'wake', since: '2026-06-15' },
     { id: 'nophone_am',  text: 'No Phone', modal: 'nophoneAm' },
     { id: 'prayer',      text: 'Prayer', modal: 'prayer' },
     { id: 'lectio',      text: 'Lectio & Journal', link: 'shortcuts://run-shortcut?name=Open%20Journal' },
@@ -2542,7 +2542,7 @@ function renderTodayStats() {
   document.getElementById('statWeek').innerHTML = `${avg}<span class="stat-unit">%</span>`;
 
   // Streak: consecutive days where daily-habit completion >= threshold
-  // (12 of 15 daily habits = locked-in day; gym/hike are weekly targets)
+  // (12 of 14 daily habits = locked-in day; gym/cardio/wake are weekly targets)
   let streak = 0;
   const todayPct = pctForDay(dKey(new Date()), DAILY_IDS);
   const startOffset = todayPct >= STREAK_THRESHOLD ? 0 : 1;
