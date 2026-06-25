@@ -2010,11 +2010,15 @@ const HABITS = [
   { cat: 'morning', items: [
     { id: 'wake',        text: 'Up before 7', meta: '6× / wk', weekly: true, weeklyTarget: 6, modal: 'wake', since: '2026-06-15' },
     { id: 'nophone_am',  text: 'No Phone', modal: 'nophoneAm' },
+    { id: 'prayer',      text: 'Prayer', modal: 'prayer', graduated: '2026-06-25' },
     { id: 'lectio',      text: 'Lectio & Journal', link: 'shortcuts://run-shortcut?name=Open%20Journal' },
     { id: 'memorize',    text: 'Memorize Scripture', link: 'https://www.bible.com/bible/1713/ROM.6.1-14.CSB' },
     { id: 'bible',       text: 'Bible Study', modal: 'bible' },
   ]},
   { cat: 'fitness', items: [
+    { id: 'protein',     text: 'Tracked Nutrition', link: 'shortcuts://run-shortcut?name=Open%20MacroFactor', graduated: '2026-06-25' },
+    { id: 'steps',       text: '10,000 Steps', link: 'x-apple-health://', graduated: '2026-06-25' },
+    { id: 'fast',        text: 'Fast', modal: 'fast', graduated: '2026-06-25' },
     { id: 'gym',         text: 'Gym',  meta: '4× / wk', weekly: true, weeklyTarget: 4 },
     { id: 'hike',        text: 'Cardio', meta: '1× / wk', weekly: true, weeklyTarget: 1 },
   ]},
@@ -2026,6 +2030,7 @@ const HABITS = [
     { id: 'teeth',       text: 'Floss', modal: 'teeth' },
     { id: 'examen',      text: 'Examen & Compline', modal: 'examen' },
     { id: 'priorities',  text: 'Priorities', modal: 'priorities' },
+    { id: 'log',         text: 'Log Habits', modal: 'log', graduated: '2026-06-25' },
   ]},
   { cat: 'weekly', items: [
     { id: 'reflect',     text: 'Reflection', meta: '1× / wk', weekly: true, weeklyTarget: 1, modal: 'reflect', since: '2026-06-15' },
@@ -2059,7 +2064,18 @@ const DAILY_IDS = HABITS.flatMap(c => c.items.filter(it => !it.weekly).map(it =>
 // A day-key (YYYY-MM-DD) sorts lexicographically, so string compare is a valid date compare.
 const SINCE = {};
 HABITS.forEach(c => c.items.forEach(it => { if (it.since) SINCE[it.id] = it.since; }));
-const activeOn = (id, key) => !SINCE[id] || key >= SINCE[id];
+
+// Per-habit graduation dates — a graduated habit stops counting on/after its date.
+// This is the mirror of SINCE: removing a habit shouldn't retroactively re-judge
+// (and break) the days when it WAS part of the routine. Graduated habits are hidden
+// from every live surface but still count toward each day before they graduated.
+const GRAD = {};
+HABITS.forEach(c => c.items.forEach(it => { if (it.graduated) GRAD[it.id] = it.graduated; }));
+const isRetired = (it) => !!it.graduated;
+const LIVE_IDS = ALL_IDS.filter(id => !GRAD[id]);
+
+const activeOn = (id, key) =>
+  (!SINCE[id] || key >= SINCE[id]) && (!GRAD[id] || key < GRAD[id]);
 const activeDaysInWindow = (id, win) => {
   if (!SINCE[id]) return win;
   let n = 0;
@@ -2411,7 +2427,9 @@ function render() {
 
   HABITS.forEach(({ cat, items }) => {
     const meta = CAT_META[cat];
-    const done = items.filter(it => state.has(it.id)).length;
+    const live = items.filter(it => !isRetired(it));
+    if (live.length === 0) return;
+    const done = live.filter(it => state.has(it.id)).length;
 
     const section = document.createElement('section');
     section.className = 'category';
@@ -2419,10 +2437,10 @@ function render() {
       <div class="category-header">
         <span class="category-numeral">${meta.numeral}</span>
         <span class="category-title">${meta.title}</span>
-        <span class="category-progress">${done} / ${items.length}</span>
+        <span class="category-progress">${done} / ${live.length}</span>
       </div>
       <ul class="habits-list">
-        ${items.map(it => {
+        ${live.map(it => {
           const launchAttrs = it.link
             ? `data-launch="link" data-target="${it.link.replace(/"/g, '&quot;')}"`
             : it.modal
@@ -2518,9 +2536,10 @@ function closeAllModals() {
 }
 
 function updateProgress() {
-  const done = state.size;
-  const pct = Math.round((done / TOTAL) * 100);
-  document.getElementById('progressCount').textContent = `${done} / ${TOTAL}`;
+  const done = LIVE_IDS.filter(id => state.has(id)).length;
+  const total = LIVE_IDS.length;
+  const pct = Math.round((done / total) * 100);
+  document.getElementById('progressCount').textContent = `${done} / ${total}`;
   document.getElementById('progressFill').style.width = pct + '%';
   document.getElementById('progressPct').textContent = pct + '%';
   document.getElementById('statToday').innerHTML = `${pct}<span class="stat-unit">%</span>`;
@@ -2536,8 +2555,10 @@ function renderTodayStats() {
   const avg = Math.round((sum / 7) * 100);
   document.getElementById('statWeek').innerHTML = `${avg}<span class="stat-unit">%</span>`;
 
-  // Streak: consecutive days where daily-habit completion >= threshold
-  // (8 of 9 daily habits = locked-in day; gym/cardio/wake are weekly targets)
+  // Streak: consecutive days where daily-habit completion >= threshold.
+  // Each day is judged by the habits active THEN (via activeOn), so graduating a
+  // habit doesn't retroactively break past days. Today forward: 8 of 9 daily.
+  // (gym/cardio/wake are weekly targets, not part of the daily count)
   let streak = 0;
   const todayPct = pctForDay(dKey(new Date()), DAILY_IDS);
   const startOffset = todayPct >= STREAK_THRESHOLD ? 0 : 1;
@@ -2719,12 +2740,14 @@ function renderStatsView() {
 
   HABITS.forEach(({ cat, items }) => {
     const meta = CAT_META[cat];
-    const ids = items.map(it => it.id);
+    const live = items.filter(it => !isRetired(it));
+    if (live.length === 0) return;
+    const ids = live.map(it => it.id);
 
     // Per-habit completion rates over window — each habit normalized correctly:
     //   • Daily habits → hits / window-days
     //   • Weekly habits → hits / (weeklyTarget × weeks-in-window), capped at 100%
-    const habitRates = items.map(it => {
+    const habitRates = live.map(it => {
       let count = 0;
       for (let i = 0; i < win; i++) {
         const d = new Date(); d.setDate(d.getDate() - i);
@@ -2743,8 +2766,8 @@ function renderStatsView() {
     });
 
     // Category average = mean of per-habit rates (so weekly habits count fairly)
-    const avg = items.length > 0
-      ? Math.round((habitRates.reduce((s, h) => s + h.rate, 0) / items.length) * 100)
+    const avg = live.length > 0
+      ? Math.round((habitRates.reduce((s, h) => s + h.rate, 0) / live.length) * 100)
       : 0;
 
     const section = document.createElement('section');
